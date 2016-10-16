@@ -1,0 +1,10 @@
+Done :
+- double linked list
+- queue
+- stack
+- red black tree
+
+Todo :
+- only the insertion on red/black tree are functionnal
+- fix the remove algorithm (in development)
+- graph

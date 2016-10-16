@@ -1,0 +1,27 @@
+#emacs temporary file
+*~
+\#*\#
+
+#autotools generated file
+*m4
+autom4te*
+compile
+config.*
+configure
+depcomp
+ltmain.sh
+Makefile
+Makefile.in
+missing
+stamp-h1
+libtool
+install-sh
+
+#autotools compilation file
+*.o
+*.lo
+*.la
+*.Plo
+.libs
+.deps
+.dirstamp
