@@ -39,7 +39,7 @@ then
 	CFLAGS+=" -g -ggdb -DDEBUG "
 fi
 
-CFLAGS+=" -W -Wall -Werror "
+CFLAGS+=" -W -Wall -Werror -fvisibility=hidden "
 
 AC_CONFIG_FILES([
 	Makefile \

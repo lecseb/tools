@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_S_LIST_H_
-# define _UTILS_S_LIST_H_
+#ifndef _TOOLS_INCLUDE_S_LIST_H_
+# define _TOOLS_INCLUDE_S_LIST_H_
 
 # include <stdint.h>
+# include "m_export.h"
 # include "t_callback.h"
 
 /**
@@ -27,7 +28,7 @@
  * @param previous : contains the link to the previous element in the list
  * @param next : contains the link to the next element in the list
  */
-struct s_list {
+export struct s_list {
 	void *data;
 	struct s_list *prev;
 	struct s_list *next;
@@ -54,7 +55,7 @@ struct s_list {
  * free them manually first.
  * @param list[out] : list instance
  */
-void s_list_delete(struct s_list *list);
+export void s_list_delete(struct s_list *list);
 
 /**
  * @brief Convenience method, which frees all the memory used by a GList, and
@@ -62,7 +63,7 @@ void s_list_delete(struct s_list *list);
  * @param list[out] : list instance
  * @param func[in] : function pointer
  */
-void s_list_delete_full(struct s_list *list, t_destroy_func func);
+export void s_list_delete_full(struct s_list *list, t_destroy_func func);
 
 /**
  * @brief Adds a new element at the end of the list. Note that the return
@@ -73,7 +74,7 @@ void s_list_delete_full(struct s_list *list, t_destroy_func func);
  * @param data[in] : the data for the new element
  * @return either list or the new start of the s_list if list was NULL.
  */
-struct s_list *s_list_append(struct s_list *list, void *data);
+export struct s_list *s_list_append(struct s_list *list, void *data);
 
 /**
  * @brief Prepends a new element at the start of the list. Note that the
@@ -83,7 +84,7 @@ struct s_list *s_list_append(struct s_list *list, void *data);
  * @return a pointer to the newly prepended element, which is the new start of
  * the list
  */
-struct s_list *s_list_prepend(struct s_list *list, void *data);
+export struct s_list *s_list_prepend(struct s_list *list, void *data);
 
 /**
  * @brief Inserts a new element into the list at the given position.
@@ -94,7 +95,7 @@ struct s_list *s_list_prepend(struct s_list *list, void *data);
  * element is added on to the end of the list.
  * @return the (possibly changed) start of the list
  */
-struct s_list *s_list_insert(struct s_list *list, void *data,
+export struct s_list *s_list_insert(struct s_list *list, void *data,
 	uint32_t position);
 
 /**
@@ -105,7 +106,7 @@ struct s_list *s_list_insert(struct s_list *list, void *data,
  * @param data[in] : the data for the element to remove
  * @return the (possibly changed) start of the list
  */
-struct s_list *s_list_remove(struct s_list *list, void *data);
+export struct s_list *s_list_remove(struct s_list *list, void *data);
 
 /**
  * @brief Removes all list nodes with data equal to data . Returns the new head
@@ -114,7 +115,7 @@ struct s_list *s_list_remove(struct s_list *list, void *data);
  * @param data[in] : data to remove
  * @return the (possibly changed) start of the list
  */
-struct s_list *s_list_remove_all(struct s_list *list, void *data);
+export struct s_list *s_list_remove_all(struct s_list *list, void *data);
 
 /**
  * @brief Remove the link between the element and the list
@@ -122,7 +123,7 @@ struct s_list *s_list_remove_all(struct s_list *list, void *data);
  * @param elt[in] : element to remove
  * @return the (possibly changed) start of the list
  */
-struct s_list *s_list_remove_element(struct s_list *list,
+export struct s_list *s_list_remove_element(struct s_list *list,
 	struct s_list *elt);
 
 /**
@@ -130,7 +131,7 @@ struct s_list *s_list_remove_element(struct s_list *list,
  * @param list[in] : list instance
  * @return the number of elements in the list
  */
-uint32_t s_list_size(struct s_list *list);
+export uint32_t s_list_size(struct s_list *list);
 
 /**
  * @brief Copies a list. This function only copy the list pointer and create a
@@ -139,7 +140,7 @@ uint32_t s_list_size(struct s_list *list);
  * @param list[in] : list instance
  * @return the start of the new list that holds the same data as list
  */
-struct s_list *s_list_copy(struct s_list *list);
+export struct s_list *s_list_copy(struct s_list *list);
 
 /**
  * @brief Makes a full copy of a list.
@@ -148,7 +149,7 @@ struct s_list *s_list_copy(struct s_list *list);
  * node, or NULL to use the original data.
  * @return the start of the new list that holds the same data as list
 */
-struct s_list *s_list_deep_copy(struct s_list *list, t_copy_func func);
+export struct s_list *s_list_deep_copy(struct s_list *list, t_copy_func func);
 
 /**
  * @brief Adds the second list onto the end of the first list. Note that the
@@ -158,7 +159,7 @@ struct s_list *s_list_deep_copy(struct s_list *list, t_copy_func func);
  * point to the top of the list
  * @return the start of the new list, which equals list1 if not NULL
  */
-struct s_list *s_list_concat(struct s_list *list1, struct s_list *list2);
+export struct s_list *s_list_concat(struct s_list *list1, struct s_list *list2);
 
 /**
  * @brief Iterate over elements contained into the list
@@ -166,7 +167,7 @@ struct s_list *s_list_concat(struct s_list *list1, struct s_list *list2);
  * @param func[in] : the function to call with each element's data
  * @param user_data[in] : user data to pass to the function
  */
-void s_list_foreach(struct s_list *list, t_foreach_func func,
+export void s_list_foreach(struct s_list *list, t_foreach_func func,
 	void *user_data);
 
 /**
@@ -174,14 +175,14 @@ void s_list_foreach(struct s_list *list, t_foreach_func func,
  * @param list[in] : a list
  * @return the first element in the list, or NULL if the list has no elements
  */
-struct s_list *s_list_first(struct s_list *list);
+export struct s_list *s_list_first(struct s_list *list);
 
 /**
  * @brief Get the last element in a list
  * @param list[in] : a list
  * @return the last element in the list, or NULL if the list has no elements
  */
-struct s_list *s_list_last(struct s_list *list);
+export struct s_list *s_list_last(struct s_list *list);
 
 /**
  * @brief Gets the element at the given position in a list.
@@ -189,7 +190,7 @@ struct s_list *s_list_last(struct s_list *list);
  * @param nth[in] : the position of the element, counting from 0
  * @return the element, or NULL if the position is off the end of the list
  */
-struct s_list *s_list_get_nth(struct s_list *list, uint32_t nth);
+export struct s_list *s_list_get_nth(struct s_list *list, uint32_t nth);
 
 /**
  * @brief Finds the element in a list which contains the given data.
@@ -197,6 +198,6 @@ struct s_list *s_list_get_nth(struct s_list *list, uint32_t nth);
  * @param data[in] : the element data to find
  * @return the found list element, or NULL if it is not found
  */
-struct s_list *s_list_find(struct s_list *list, void *data);
+export struct s_list *s_list_find(struct s_list *list, void *data);
 
-#endif /* !_UTILS_SXI_LIST_H_ */
+#endif /* !_TOOLS_INCLUDE_S_LIST_H_ */

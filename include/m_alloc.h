@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_M_ALLOC_H_
-# define _UTILS_M_ALLOC_H_
+#ifndef _TOOLS_INCLUDE_M_ALLOC_H_
+# define _TOOLS_INCLUDE_M_ALLOC_H_
 
 # include <assert.h>
 # include <stdint.h>
@@ -49,4 +49,4 @@ void *_realloc(void *ptr, uint32_t size);
  */
 void _free(void *ptr);
 
-#endif /* !_UTILS_M_ALLOC_H_ */
+#endif /* !_TOOLS_INCLUDE_M_ALLOC_H_ */

@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_T_FUNC_H_
-# define _UTILS_T_FUNC_H_
+#ifndef _TOOLS_INCLUDE_T_FUNC_H_
+# define _TOOLS_INCLUDE_T_FUNC_H_
 
 /**
  * @brief Specifies the type of function which is called when a data element is
@@ -49,4 +49,4 @@ typedef int (*t_foreach_func)(void *data, void *user_data);
  */
 typedef int (*t_compare_func)(void *src, void *dst);
 
-#endif /* !_UTILS_T_FUNC_H_ */
+#endif /* !_TOOLS_INCLUDE_T_FUNC_H_ */

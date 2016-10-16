@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_M_PRINT_H_
-# define _UTILS_M_PRINT_H_
+#ifndef _TOOLS_INCLUDE_M_PRINT_H_
+# define _TOOLS_INCLUDE_M_PRINT_H_
 
 # include <errno.h>
 # include <stdio.h>
@@ -90,4 +90,4 @@
 # define m_errno_print(val) \
 	m_error_print("%s:%d %s\n", __func__, __LINE__, strerror(val));
 
-#endif /* !_UTILS_M_PRINT_H_ */
+#endif /* !_TOOLS_INCLUDE_M_PRINT_H_ */

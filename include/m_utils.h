@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_M_UTILS_H_
-# define _UTILS_M_UTILS_H_
+#ifndef _TOOLS_INCLUDE_M_UTILS_H_
+# define _TOOLS_INCLUDE_M_UTILS_H_
 
 # include "m_print.h"
 
@@ -111,4 +111,4 @@
  */
 # define m_ptr_to_int(val) (int)((long)val)
 
-#endif /* !_UTILS_M_UTILS_H_ */
+#endif /* !_TOOLS_INCLUDE_M_UTILS_H_ */

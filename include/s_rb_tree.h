@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _UTILS_S_RB_TREE_H_
-# define _UTILS_S_RB_TREE_H_
+#ifndef _TOOLS_INCLUDE_S_RB_TREE_H_
+# define _TOOLS_INCLUDE_S_RB_TREE_H_
 
 # include "s_queue.h"
+# include "m_export.h"
 # include "t_callback.h"
 
 /**
@@ -28,7 +29,7 @@
  * @param e_tree_depth_first: depth-first order
  * @param e_tree_breath_first: breath-first order
  */
-enum e_tree_browse {
+export enum e_tree_browse {
 	e_tree_depth_pre,
 	e_tree_depth_post,
 	e_tree_depth_in,
@@ -38,20 +39,21 @@ enum e_tree_browse {
 /**
  * @brief Binary search tree structure (opaque)
  */
-struct s_rb_tree;
+export struct s_rb_tree;
 
 /**
  * @brief Deallocate a red/black tree instance
  * @param tree[in] : instance to delete
  */
-void s_rb_tree_delete(struct s_rb_tree *tree);
+export void s_rb_tree_delete(struct s_rb_tree *tree);
 
 /**
  * @brief Deallocate a red/black tree instance
  * @param tree[in] : instance to delete
  * @param destroy[in] : destroy callback
  */
-void s_rb_tree_delete_full(struct s_rb_tree *tree, t_destroy_func destroy);
+export void s_rb_tree_delete_full(struct s_rb_tree *tree,
+	t_destroy_func destroy);
 
 /**
  * @brief Add an element into a tree by following the binary search tree rule
@@ -61,7 +63,7 @@ void s_rb_tree_delete_full(struct s_rb_tree *tree, t_destroy_func destroy);
  * @param data[in] : data to push into the tree
  * @return the (possibly changed) root of the tree
  */
-struct s_rb_tree *s_rb_tree_add(struct s_rb_tree *tree,
+export struct s_rb_tree *s_rb_tree_add(struct s_rb_tree *tree,
 	t_compare_func compare, void *data);
 
 /**
@@ -72,7 +74,7 @@ struct s_rb_tree *s_rb_tree_add(struct s_rb_tree *tree,
  * @param data[in] : data to push into the tree
  * @return the (possibly changed) root of the tree
  */
-struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
+export struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
 	t_compare_func compare, t_destroy_func destroy, void *data);
 
 /**
@@ -81,7 +83,7 @@ struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
-void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
+export void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
 
 /**
  * @brief Get the nth smaller element from the tree
@@ -89,7 +91,7 @@ void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
-void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
+export void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
 
 /**
  * @brief Browse the entire tree according to the type of search asked
@@ -99,7 +101,7 @@ void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
  * @param data[in] : user data pass through the callback
  * @return 0 on success, errno on error
  */
-int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
+export int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
 	t_foreach_func foreach, void *data);
 
 /**
@@ -108,6 +110,6 @@ int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
  * @param file[in] : file to create/write
  * @return 0 on success, -errno on error
  */
-int s_rb_tree_dump_dot(struct s_rb_tree *tree, const char *file);
+export int s_rb_tree_dump_dot(struct s_rb_tree *tree, const char *file);
 
-#endif /* !_UTILS_S_RB_TREE_H_ */
+#endif /* !_TOOLS_INCLUDE_S_RB_TREE_H_ */
