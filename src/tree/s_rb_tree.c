@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -247,15 +247,18 @@ static int _s_rb_tree_dump_node(struct s_rb_tree *tree, FILE *file)
 	m_return_val_if_fail(file, -EINVAL);
 
 	char buff[512];
-	if (tree->color == _e_red) {
-		snprintf(buff, 512, "\t%d[color=red,style=filled]\n",
-			m_ptr_to_int(tree->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
+	const char *color;
+	if (_s_rb_tree_get_color(tree) == _e_red) {
+		color = "red";
+	} else if (_s_rb_tree_get_color(tree) == _e_black) {
+		color = "grey";
 	} else {
-		snprintf(buff, 512, "\t%d[color=gray,style=filled]\n",
-			m_ptr_to_int(tree->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
+		color = "green";
 	}
+
+	snprintf(buff, 512, "\t%d[color=%s,style=filled]\n",
+		m_ptr_to_int(tree->data), color);
+	fwrite(buff, strlen(buff), sizeof(char), file);
 
 	return 0;
 }
