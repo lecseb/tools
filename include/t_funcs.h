@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _TOOLS_INCLUDE_T_FUNC_H_
-# define _TOOLS_INCLUDE_T_FUNC_H_
+#ifndef _TOOLS_INCLUDE_T_FUNCS_H_
+# define _TOOLS_INCLUDE_T_FUNCS_H_
 
 /**
  * @brief Specifies the type of function which is called when a data element is
@@ -35,7 +35,7 @@ typedef int (*t_destroy_func)(void *data);
 typedef void *(*t_copy_func)(void *data);
 
 /**
- * @brief Specifies the type of functions passed to sxi_list_foreach()
+ * @brief Specifies the type of functions passed threw *_foreach() function
  * @param data[in] : the element's data
  * @param user_data[in] : additional data
  */
@@ -49,4 +49,4 @@ typedef int (*t_foreach_func)(void *data, void *user_data);
  */
 typedef int (*t_compare_func)(void *src, void *dst);
 
-#endif /* !_TOOLS_INCLUDE_T_FUNC_H_ */
+#endif /* !_TOOLS_INCLUDE_T_FUNCS_H_ */

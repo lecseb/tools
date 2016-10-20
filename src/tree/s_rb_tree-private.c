@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -48,6 +48,7 @@ void _s_rb_tree_right_rotate(struct s_rb_tree *a)
 	struct s_rb_tree *b = _s_rb_tree_get_left(a);
 	struct s_rb_tree *a_right = _s_rb_tree_get_right(a);
 	struct s_rb_tree *d = _s_rb_tree_get_left(b);
+	struct s_rb_tree *c = _s_rb_tree_get_right(a);
 
 	/* in that case (a) -> (b) */
 	_s_rb_tree_set_data(a, _s_rb_tree_get_data(b));
@@ -61,6 +62,7 @@ void _s_rb_tree_right_rotate(struct s_rb_tree *a)
 	_s_rb_tree_set_color(b, color);
 	_s_rb_tree_set_left(b, _s_rb_tree_get_right(b));
 	_s_rb_tree_set_right(b, a_right);
+	_s_rb_tree_set_parent(c, b);
 }
 
 
@@ -81,6 +83,7 @@ void _s_rb_tree_left_rotate(struct s_rb_tree *a)
 	enum _e_color color = _s_rb_tree_get_color(a);
 	struct s_rb_tree *c = _s_rb_tree_get_right(a);
 	struct s_rb_tree *a_left = _s_rb_tree_get_left(a);
+	struct s_rb_tree *b = _s_rb_tree_get_left(a);
 	struct s_rb_tree *e = _s_rb_tree_get_right(c);
 
 	/* in that case (a) -> (c) */
@@ -95,4 +98,5 @@ void _s_rb_tree_left_rotate(struct s_rb_tree *a)
 	_s_rb_tree_set_color(c, color);
 	_s_rb_tree_set_right(c, _s_rb_tree_get_left(c));
 	_s_rb_tree_set_left(c, a_left);
+	_s_rb_tree_set_parent(b, c);
 }

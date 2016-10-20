@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _TOOLS_INCLUDE_S_RB_TREE_H_
-# define _TOOLS_INCLUDE_S_RB_TREE_H_
+#ifndef _TOOLS_INCLUDE_TREE_S_RB_TREE_H_
+# define _TOOLS_INCLUDE_TREE_S_RB_TREE_H_
 
-# include "s_queue.h"
+# include <stdint.h>
 # include "m_export.h"
-# include "t_callback.h"
+# include "t_funcs.h"
 
 /**
  * @brief Browse type definition order
@@ -83,6 +83,15 @@ export struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
+export int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func compare,
+	void *data);
+
+/**
+ * @brief Get the nth smaller element from the tree
+ * @param tree[in] : tree to browse
+ * @param nth[in] : the nth smaller element
+ * @return a valid pointer on success, NULL on error
+ */
 export void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
 
 /**
@@ -92,6 +101,20 @@ export void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
  * @return a valid pointer on success, NULL on error
  */
 export void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
+
+/**
+ * @brief Convenient macro to get the biggest element into the tree
+ * @param tree[in] : tree to browse
+ */
+# define s_rb_tree_get_biggest(tree) \
+	s_rb_tree_nth_biggest(tree, 1)
+
+/**
+ * @brief Convenient macro to get the biggest element into the tree
+ * @param tree[in] : tree to browse
+ */
+# define s_rb_tree_get_smallest(tree) \
+	s_rb_tree_nth_smallest(tree, 1)
 
 /**
  * @brief Browse the entire tree according to the type of search asked
@@ -112,4 +135,4 @@ export int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
  */
 export int s_rb_tree_dump_dot(struct s_rb_tree *tree, const char *file);
 
-#endif /* !_TOOLS_INCLUDE_S_RB_TREE_H_ */
+#endif /* !_TOOLS_INCLUDE_TREE_S_RB_TREE_H_ */

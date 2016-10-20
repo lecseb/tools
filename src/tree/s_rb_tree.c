@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -15,7 +15,7 @@
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
 #include <string.h>
-#include "s_rb_tree.h"
+#include "queue/s_queue.h"
 #include "s_rb_tree-private.h"
 #include "m_alloc.h"
 #include "m_utils.h"
@@ -55,45 +55,74 @@ void s_rb_tree_delete_full(struct s_rb_tree *tree, t_destroy_func destroy)
  * find implementation
  * -----------------------------------------------------------------------------
  */
-
-void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth)
+/**
+ * @brief Core function
+ */
+static void *_s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth,
+	uint32_t k)
 {
 	m_return_val_if_fail(tree, NULL);
 	m_return_val_if_fail(nth > 0, NULL);
 
 	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
 	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-	static uint32_t k = 0;
 
-	struct s_rb_tree *elt = (left) ? s_rb_tree_nth_smallest(left, nth) : NULL;
-
-	if (elt)
-		return _s_rb_tree_get_data(elt);
+	void *data = (left) ? _s_rb_tree_nth_smallest(left, nth, k) : NULL;
+	if (data)
+		return data;
 	else if (++k == nth)
 		return _s_rb_tree_get_data(tree);
 
-	elt = (right) ? s_rb_tree_nth_smallest(right, nth) : elt;
-	return _s_rb_tree_get_data(elt);
+	return (right) ? _s_rb_tree_nth_smallest(right, nth, k) : data;
+}
+
+void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth)
+{
+	return _s_rb_tree_nth_smallest(tree, nth, 0);
+}
+
+/**
+ * @brief Core function
+ */
+static void *_s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth,
+	uint32_t k)
+{
+	m_return_val_if_fail(tree, NULL);
+	m_return_val_if_fail(nth > 0, NULL);
+
+	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
+	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
+
+	void *data = (left) ? s_rb_tree_nth_biggest(right, nth) : NULL;
+
+	if (data)
+		return data;
+	else if (++k == nth)
+		return _s_rb_tree_get_data(tree);
+
+	return (right) ? s_rb_tree_nth_biggest(left, nth) : data;
 }
 
 void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth)
 {
-	m_return_val_if_fail(tree, NULL);
-	m_return_val_if_fail(nth > 0, NULL);
+	return _s_rb_tree_nth_biggest(tree, nth, 0);
+}
+
+int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func cmp, void *data)
+{
+	m_return_val_if_fail(tree, -EINVAL);
+	m_return_val_if_fail(cmp, -EINVAL);
 
 	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
 	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-	static uint32_t k = 0;
 
-	struct s_rb_tree *elt = (left) ? s_rb_tree_nth_biggest(right, nth) : NULL;
-
-	if (elt)
-		return _s_rb_tree_get_data(elt);
-	else if (++k == nth)
-		return _s_rb_tree_get_data(tree);
-
-	elt = (right) ? s_rb_tree_nth_biggest(left, nth) : elt;
-	return _s_rb_tree_get_left(elt);
+	int ret = cmp(_s_rb_tree_get_data(tree), data);
+	if (ret == 0)
+		return 0;
+	else if (ret > 0)
+		return (left) ? s_rb_tree_exist(left, cmp, data) : -EAGAIN;
+	else
+		return (right) ? s_rb_tree_exist(right, cmp, data) : -EAGAIN;
 }
 
 /**
@@ -247,15 +276,18 @@ static int _s_rb_tree_dump_node(struct s_rb_tree *tree, FILE *file)
 	m_return_val_if_fail(file, -EINVAL);
 
 	char buff[512];
-	if (tree->color == _e_red) {
-		snprintf(buff, 512, "\t%d[color=red,style=filled]\n",
-			m_ptr_to_int(tree->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
+	const char *color;
+	if (_s_rb_tree_get_color(tree) == _e_red) {
+		color = "red";
+	} else if (_s_rb_tree_get_color(tree) == _e_black) {
+		color = "grey";
 	} else {
-		snprintf(buff, 512, "\t%d[color=gray,style=filled]\n",
-			m_ptr_to_int(tree->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
+		color = "green";
 	}
+
+	snprintf(buff, 512, "\t%c[color=%s,style=filled]\n",
+		m_ptr_to_int(tree->data), color);
+	fwrite(buff, strlen(buff), sizeof(char), file);
 
 	return 0;
 }
@@ -277,13 +309,13 @@ static int _s_rb_tree_dump_dot(struct s_rb_tree *tree, FILE *file)
 
 	int ret = _s_rb_tree_dump_node(tree, file);
 	if (left) {
-		snprintf(buff, 512, "\t%d -- %d;\n", m_ptr_to_int(tree->data),
+		snprintf(buff, 512, "\t%c -- %c;\n", m_ptr_to_int(tree->data),
 			 m_ptr_to_int(left->data));
 		fwrite(buff, strlen(buff), sizeof(char), file);
 		ret |= _s_rb_tree_dump_dot(left, file);
 	}
 	if (right) {
-		snprintf(buff, 512, "\t%d -- %d;\n", m_ptr_to_int(tree->data),
+		snprintf(buff, 512, "\t%c -- %c;\n", m_ptr_to_int(tree->data),
 			 m_ptr_to_int(right->data));
 		fwrite(buff, strlen(buff), sizeof(char), file);
 		ret |= _s_rb_tree_dump_dot(right, file);

@@ -1,12 +1,12 @@
 /**
  * This file is part of libtools
  *
- * Foobar is free software: you can redistribute it and/or modify
+ * libtools is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
 
- * Foobar is distributed in the hope that it will be useful,
+ * libtools is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#include "s_rb_tree.h"
 #include "s_rb_tree-private.h"
 #include "m_utils.h"
 
 /**
+ * v = deleted node ; u = replaced child
  * 1) Perform standard BST delete. When we perform standard delete operation in
  *    BST, we always end up deleting a node which is either leaf or has only one
  *    child (For an internal node, we copy the successor and then recursively
@@ -64,17 +64,29 @@
  *   3.3) If u is root, make it single black and return (Black height of
  *        complete tree reduces by 1).
  */
+
+/**
+ * @brief Internal double black node
+ */
+static struct s_rb_tree _d_black = {
+	.data = NULL,
+	.color = _e_d_black,
+	.left = NULL,
+	.right = NULL,
+	.parent = NULL,
+};
+
 /**
  * @brief Convenience macro to delete only one node without reccursion
  * @param node[in] : node to delete
  * @param operator[in] : user data deletion operator
  */
-#define _s_bs_tree_delete_single(node, operator) { \
+#define _s_rb_tree_delete_single(node, operator) { \
 	(node)->left = (node)->right = NULL; \
 	if (operator) \
-			s_rb_tree_delete_full((node), (operator)); \
+		s_rb_tree_delete_full((node), (operator)); \
 	else \
-			s_rb_tree_delete(node); \
+		s_rb_tree_delete(node); \
 }
 
 /**
@@ -83,161 +95,302 @@
  * @param btree[in] : root tree to search
  * @return a valid tree pointer on succes, NULL on error
  */
-static struct s_rb_tree *_s_bs_tree_find_min(struct s_rb_tree *tree)
+struct s_rb_tree *_s_bs_tree_find_min(struct s_rb_tree *v)
 {
-	m_return_val_if_fail(tree, tree);
+	m_return_val_if_fail(v, v);
 
-	struct s_rb_tree *curr = tree;
+	struct s_rb_tree *cur = NULL;
+	for (cur = v; _s_rb_tree_get_left(cur); cur = _s_rb_tree_get_left(cur))
+		;
 
-	while (_s_rb_tree_get_left(curr))
-		curr = _s_rb_tree_get_left(curr);
-
-	return curr;
+	return cur;
 }
 
 /**
- * @brief Reduce the double black from the tree (case a)
- * @param s[in] : sibling
- * @param s_left[in] : left sibling child
- * @param s_right[in] : right sibling child
- * @param r[in] : red sibling from s
+ * @brief Use for implementing the case 2)
+ * @param v[in] : node to remove
+ * @param u[in] : child node of v
+ * @param destroy[in] : user destroy function
+ * @return the modified v node or NULL
  */
-#define _s_rb_tree_reduce_case_a(s, s_left, s_right, r) { \
-	do { \
-		if (_s_rb_tree_is_left(_s_rb_tree_get_parent(s), s) && \
-			(_s_rb_tree_is_left(s, r) || \
-			(_s_rb_tree_get_color(s_left) == _e_red && \
-			_s_rb_tree_get_color(s_right) == _e_red))) { \
-ll_case: \
-			m_warning_print("> %s: left left case\n", __func__); \
-			/* case i left left case */ \
-			_s_rb_tree_right_rotate(s); \
-		} else if (_s_rb_tree_is_left(_s_rb_tree_get_parent(s), s) && \
-			_s_rb_tree_is_right(s, r)) { \
-			m_warning_print("> %s: left right case\n", __func__); \
-			/* case ii left right case */ \
-			_s_rb_tree_left_rotate(s); \
-			goto ll_case; \
-		} else if (_s_rb_tree_is_right(_s_rb_tree_get_parent(s), s) && \
-			(_s_rb_tree_is_right(s, r) || \
-			(_s_rb_tree_get_color(s_left) == _e_red && \
-			_s_rb_tree_get_color(s_right) == _e_red))) { \
-rr_case: \
-			m_warning_print("> %s: right right case\n", __func__); \
-			/* case iii right right case */ \
-			_s_rb_tree_left_rotate(_s_rb_tree_get_parent(s)); \
-		} else if (_s_rb_tree_is_right(_s_rb_tree_get_parent(s), s) && \
-			_s_rb_tree_is_left(s, r)) { \
-			m_warning_print("> %s: right left case\n", __func__); \
-			/* case iv right left case */ \
-			_s_rb_tree_right_rotate(s); \
-			goto rr_case; \
-		} \
-	} while (0); \
-}
-
-/**
- * @brief Reduce the double black from the tree (case b)
- * @param s[in] : sibling
- * @param s_left[in] : left sibling child
- * @param s_right[in] : right sibling child
- * @param r[in] : red sibling from s
- */
-#define _s_rb_tree_reduce_case_b(s, s_left, s_right, r)
-
-/**
- * @brief Reduce the double black from the tree (case c)
- * @param s[in] : sibling
- * @param s_left[in] : left sibling child
- * @param s_right[in] : right sibling child
- * @param r[in] : red sibling from s
- */
-#define _s_rb_tree_reduce_case_c(s, s_left, s_right, r)
-
-/**
- * @brief Reduce double black from the tree
- * @pram node[in] : node to remove and resolve double black entry point
- */
-static void _s_rb_tree_reduce_d_black(struct s_rb_tree *node)
+struct s_rb_tree *_s_bs_tree_switch(struct s_rb_tree *v,
+	struct s_rb_tree *u, t_destroy_func destroy)
 {
-	m_return_if_fail(node);
+	m_return_val_if_fail(v, v);
 
-	struct s_rb_tree *s = _s_rb_tree_get_sibling(node);
-	struct s_rb_tree *s_left = _s_rb_tree_get_left(s);
-	struct s_rb_tree *s_right = _s_rb_tree_get_right(s);
-	struct s_rb_tree *r = (_s_rb_tree_get_color(s_left) == _e_red) ?
-		s_left : (_s_rb_tree_get_color(s_right) == _e_red) ? s_right : NULL;
-
-	m_warning_print("> %s: s(%d) = %d\n", __func__,
-		m_ptr_to_int(_s_rb_tree_get_data(s)),
-		_s_rb_tree_get_color(s));
-	m_warning_print("> %s: r(%d) = %d\n", __func__,
-		m_ptr_to_int(_s_rb_tree_get_data(r)),
-		_s_rb_tree_get_color(r));
-
-	if (_s_rb_tree_get_color(s) == _e_black && r) {
-		_s_rb_tree_reduce_case_a(s, s_left, s_right, r);
-	} else if (_s_rb_tree_get_color(s) == _e_black &&
-		_s_rb_tree_get_color(_s_rb_tree_get_left(s)) == _e_black &&
-		_s_rb_tree_get_color(_s_rb_tree_get_right(s))) {
-		_s_rb_tree_reduce_case_b(s, s_left, s_right, r);
-	} else if (_s_rb_tree_get_color(s) == _e_red) {
-		_s_rb_tree_reduce_case_c(s, s_left, s_right, r);
+	if (u) {
+		_s_rb_tree_set_data(v, _s_rb_tree_get_data(u));
+		_s_rb_tree_set_color(v, _e_black);
+		_s_rb_tree_set_left(v, _s_rb_tree_get_left(u));
+		_s_rb_tree_set_parent(_s_rb_tree_get_left(u), v);
+		_s_rb_tree_set_right(v, _s_rb_tree_get_right(u));
+		_s_rb_tree_set_parent(_s_rb_tree_get_right(u), v);
+		_s_rb_tree_delete_single(u, NULL);
+		return v;
+	} else {
+		if (_s_rb_tree_is_left(_s_rb_tree_get_parent(v), v)) {
+			_s_rb_tree_set_left(_s_rb_tree_get_parent(v), NULL);
+		} else if (_s_rb_tree_is_right(_s_rb_tree_get_parent(v), v)) {
+			_s_rb_tree_set_right(_s_rb_tree_get_parent(v), NULL);
+		}
+		_s_rb_tree_delete_single(v, destroy);
+		return NULL;
 	}
 }
 
 /**
- * @brief Perform a simple change color and call double black reduction
- * if needed
- * @param tree[in] : node to remove
- * @param left[in] : left node to the removed one
- * @param right[in] : right node to the removed one
+ * @brief Use to import double black node in the tree
+ * @param v[in] : node to remove
+ * @param u[in] : child node of v
+ * @param destroy[in] : user destroy function
+ * @return the double black node on success, NULL on error
  */
-#define _s_rb_tree_change_color(tree, left, right) { \
-	do { \
-		if (_s_rb_tree_get_color(tree) == _e_red || \
-			_s_rb_tree_get_color(right) == _e_red || \
-			_s_rb_tree_get_color(left) == _e_red) { \
-			_s_rb_tree_set_color((right) ? right : left, _e_black); \
-		} else if (_s_rb_tree_get_color(tree) == _e_black && \
-			_s_rb_tree_get_color(right) == _e_black && \
-			_s_rb_tree_get_color(left) == _e_black) { \
-			_s_rb_tree_set_color((right) ? right : left, _e_d_black); \
-			_s_rb_tree_reduce_d_black((right) ? right : left); \
-		} \
-	} while (0); \
+struct s_rb_tree *_s_bs_tree_d_black(struct s_rb_tree *v,
+	struct s_rb_tree *u, t_destroy_func destroy)
+{
+	m_return_val_if_fail(v, v);
+
+	struct s_rb_tree *p = _s_rb_tree_get_parent(v);
+	struct s_rb_tree *db = &_d_black;
+
+	_s_rb_tree_set_color(db, _e_d_black);
+	if (_s_rb_tree_is_left(p, v)) {
+		_s_rb_tree_set_left(p, db);
+	} else {
+		_s_rb_tree_set_right(p, db);
+	}
+	_s_rb_tree_set_parent(db, p);
+
+	if (u) {
+		if (_s_rb_tree_is_left(v, u)) {
+			_s_rb_tree_set_left(db, u);
+			_s_rb_tree_set_right(db, NULL);
+		} else {
+			_s_rb_tree_set_left(db, NULL);
+			_s_rb_tree_set_right(db, u);
+		}
+	}
+	_s_rb_tree_set_color(u, _e_black);
+	_s_rb_tree_delete_single(v, destroy);
+	return &_d_black;
 }
 
-struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
-	t_compare_func compare, t_destroy_func destroy, void *data)
+/**
+ * @brief Convenient macro to check if we reach the case a)
+ * @param s[in] : sibling node of v (node to remove)
+ */
+# define _s_rb_tree_is_black_sibling_red_child(s) \
+	(_s_rb_tree_get_color(s) == _e_black && \
+		(_s_rb_tree_get_color(_s_rb_tree_get_left(s)) == _e_red || \
+		_s_rb_tree_get_color(_s_rb_tree_get_right(s)) == _e_red))
+
+/**
+ * @brief Perform the case a)
+ * @param s[in] : sibling node of v (node to remove)
+ */
+static void _s_rb_tree_black_sibling_red_child(struct s_rb_tree *u,
+	struct s_rb_tree *s)
 {
-	m_return_val_if_fail(tree, tree);
-	m_return_val_if_fail(compare, tree);
-
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	int ret = compare(_s_rb_tree_get_data(tree), data);
-	if (ret == 0) {
-		if ((!left && right) || (left && !right)) {
-			_s_rb_tree_change_color(tree, left, right);
-			_s_bs_tree_delete_single(tree, destroy);
-			return (!right) ? left : right;
-		} else if (!right && !left) {
-			_s_rb_tree_set_color(tree, _e_d_black);
-			_s_rb_tree_reduce_d_black(tree);
-			return tree;
+	/* (i) left left case */
+	if (_s_rb_tree_is_left(_s_rb_tree_get_parent(s), s) &&
+		_s_rb_tree_get_color(_s_rb_tree_get_left(s)) == _e_red) {
+ll_case:
+		_s_rb_tree_set_color(_s_rb_tree_get_left(s), _e_black);
+		_s_rb_tree_right_rotate(_s_rb_tree_get_parent(s));
+		if (u == &_d_black) {
+			_s_rb_tree_set_color(u, _e_black);
+			_s_rb_tree_set_left(_s_rb_tree_get_parent(u), NULL);
+			_s_rb_tree_set_parent(u, NULL);
 		} else {
+			_s_rb_tree_set_color(u, _e_black);
+		}
+	/* (ii) left right case */
+	} else if (_s_rb_tree_is_left(_s_rb_tree_get_parent(s), s) &&
+		_s_rb_tree_get_color(_s_rb_tree_get_right(s)) == _e_red) {
+		_s_rb_tree_set_color(_s_rb_tree_get_right(s), _e_black);
+		_s_rb_tree_left_rotate(s);
+		goto ll_case;
+	/* (iii) right right case */
+	} else if (_s_rb_tree_is_right(_s_rb_tree_get_parent(s), s) &&
+		_s_rb_tree_get_color(_s_rb_tree_get_right(s)) == _e_red) {
+rr_case:
+		_s_rb_tree_set_color(_s_rb_tree_get_right(s), _e_black);
+		_s_rb_tree_left_rotate(_s_rb_tree_get_parent(s));
+		if (u == &_d_black) {
+			_s_rb_tree_set_color(u, _e_black);
+			_s_rb_tree_set_left(_s_rb_tree_get_parent(u), NULL);
+			_s_rb_tree_set_parent(u, NULL);
+		} else {
+			_s_rb_tree_set_color(u, _e_black);
+		}
+	} else if (_s_rb_tree_is_right(_s_rb_tree_get_parent(s), s) &&
+		_s_rb_tree_get_color(_s_rb_tree_get_left(s)) == _e_red) {
+		_s_rb_tree_set_color(_s_rb_tree_get_left(s), _e_black);
+		_s_rb_tree_right_rotate(s);
+		goto rr_case;
+	}
+}
+
+/**
+ * @brief Convenient macro to check if we reach the case b)
+ * @param s[in] : sibling node of v (node to remove)
+ */
+# define _s_rb_tree_is_black_sibling_black_childs(s) \
+	(_s_rb_tree_get_color(s) == _e_black && \
+		_s_rb_tree_get_color(_s_rb_tree_get_left(s)) == _e_black && \
+		_s_rb_tree_get_color(_s_rb_tree_get_right(s)) == _e_black)
+
+/**
+ * @brief Perform the case b)
+ * @param u[in] : child node of v (node to remove)
+ * @param s[in] : sibling of u
+ */
+static struct s_rb_tree *_s_rb_tree_black_sibling_black_childs(
+	struct s_rb_tree *u, struct s_rb_tree *s)
+{
+	m_return_val_if_fail(u, u);
+
+	_s_rb_tree_set_color(s, _e_red);
+	if (u == &_d_black) {
+		_s_rb_tree_set_color(u, _e_black);
+		if (_s_rb_tree_is_left(_s_rb_tree_get_parent(u), u)) {
+			_s_rb_tree_set_left(_s_rb_tree_get_parent(u),
+				NULL);
+		} else {
+			_s_rb_tree_set_right(_s_rb_tree_get_parent(u),
+				NULL);
+		}
+	} else {
+		_s_rb_tree_set_color(u, _e_black);
+	}
+	if (_s_rb_tree_get_color(_s_rb_tree_get_parent(u)) == _e_black) {
+		_s_rb_tree_set_color(_s_rb_tree_get_parent(u), _e_d_black);
+	} else {
+		_s_rb_tree_set_color(_s_rb_tree_get_parent(u), _e_black);
+	}
+	return _s_rb_tree_get_parent(u);
+}
+
+/**
+ * @brief Perform the case c)
+ * @param u[in] : child node of v (node to remove)
+ * @param s[in] : sibling of u
+ */
+static void _s_rb_tree_red_sibling(struct s_rb_tree *u, struct s_rb_tree *s)
+{
+	m_return_if_fail(u);
+	m_return_if_fail(s);
+
+	_s_rb_tree_set_color(u, _e_red);
+	_s_rb_tree_set_color(s, _e_black);
+
+	/* (i) */
+	if (_s_rb_tree_is_left(u, s)) {
+		_s_rb_tree_right_rotate(_s_rb_tree_get_parent(u));
+	/* (ii) */
+	} else {
+		_s_rb_tree_left_rotate(_s_rb_tree_get_parent(u));
+	}
+	_s_rb_tree_set_color(s, _e_red);
+	if (u == &_d_black) {
+		_s_rb_tree_set_color(u, _e_black);
+		if (_s_rb_tree_is_left(_s_rb_tree_get_parent(u), u)) {
+			_s_rb_tree_set_left(_s_rb_tree_get_parent(u), NULL);
+		} else {
+			_s_rb_tree_set_right(_s_rb_tree_get_parent(u), NULL);
+		}
+	} else {
+		_s_rb_tree_set_color(u, _e_black);
+	}
+}
+
+/**
+ * @brief Reduce double black conflict into the tree (apply case 3)
+ * @param u[in] : child of node (possibly older v)
+ */
+static void _s_rb_tree_reduce_d_black(struct s_rb_tree *u)
+{
+	m_return_if_fail(u);
+
+	/* 3) */
+	while (_s_rb_tree_get_color(u) == _e_d_black &&
+	       _s_rb_tree_get_parent(u)) {
+		struct s_rb_tree *s = _s_rb_tree_get_sibling(u);
+
+		/* a) */
+		if (_s_rb_tree_is_black_sibling_red_child(s)) {
+			_s_rb_tree_black_sibling_red_child(u, s);
+		/* b) */
+		} else if (_s_rb_tree_is_black_sibling_black_childs(s)) {
+			u = _s_rb_tree_black_sibling_black_childs(u, s);
+		/* c) */
+		} else if (_s_rb_tree_get_color(s) == _e_red) {
+			_s_rb_tree_red_sibling(u, s);
+		}
+
+		/* 3.3) */
+		if (!_s_rb_tree_get_parent(u) &&
+			_s_rb_tree_get_color(u) == _e_d_black)
+			_s_rb_tree_set_color(u, _e_black);
+	}
+}
+
+/**
+ * @brief Remove core algorithm. Apply a binary search tree remove algorith +
+ * rearrangement process
+ * @param v[in] : node to delete
+ * @param cmp[in] : user compare function
+ * @param del[in] : user destroy function
+ * @param data[in] : data to find and remove
+ * @return the new pointer associate to the previous node location
+ */
+static struct s_rb_tree *_s_bs_tree_remove(struct s_rb_tree *v,
+	t_compare_func cmp, t_destroy_func del, void *data)
+{
+	m_return_val_if_fail(v, v);
+	m_return_val_if_fail(cmp, v);
+
+	struct s_rb_tree *left = _s_rb_tree_get_left(v);
+	struct s_rb_tree *right = _s_rb_tree_get_right(v);
+	int ret = cmp(_s_rb_tree_get_data(v), data);
+
+	if (ret == 0) {
+		if (left && right) {
 			struct s_rb_tree *tmp = _s_bs_tree_find_min(right);
-			tree->data = _s_rb_tree_get_data(tmp);
-			tree->right = s_rb_tree_remove(right, compare, destroy,
-				_s_rb_tree_get_data(tmp));
+			_s_rb_tree_set_data(v, _s_rb_tree_get_data(tmp));
+			_s_rb_tree_set_right(v, _s_bs_tree_remove(right, cmp,
+				del, _s_rb_tree_get_data(tmp)));
+		} else {
+			struct s_rb_tree *u = left ? left : right;
+			if (_s_rb_tree_get_color(v) == _e_red ||
+				_s_rb_tree_get_color(u) == _e_red) {
+				return _s_bs_tree_switch(v, u, del);
+			}
+			/* both are black: in case of no u, we will
+			 * replace the current v by an inner double
+			 * black node */
+			_s_rb_tree_reduce_d_black(_s_bs_tree_d_black(v, u, del));
+			return NULL;
 		}
 	} else if (ret > 0) {
-		tree->left = s_rb_tree_remove(left, compare, destroy, data);
+		_s_bs_tree_remove(left, cmp, del, data);
 	} else {
-		tree->right = s_rb_tree_remove(right, compare, destroy, data);
+		_s_bs_tree_remove(right, cmp, del, data);
 	}
-	return tree;
+	return v;
 }
 
+struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *v,
+	t_compare_func compare, t_destroy_func destroy, void *data)
+{
+	m_return_val_if_fail(v, v);
+	m_return_val_if_fail(compare, v);
+
+	if (compare(_s_rb_tree_get_data(v), data) == 0 &&
+		!_s_rb_tree_get_left(v) && !_s_rb_tree_get_right(v)) {
+		_s_rb_tree_delete_single(v, destroy);
+		return NULL;
+	}
+
+	return _s_bs_tree_remove(v, compare, destroy, data);
+}
