@@ -45,103 +45,123 @@ struct s_rb_tree {
 /**
  * @brief A convenience macro to get the data in an element.
  */
-# define _s_rb_tree_get_data(tree) ((tree) ? (tree)->data : NULL)
+# define m_s_rb_tree_get_data(tree) ((tree) ? (tree)->data : NULL)
 
 /**
  * @brief A convenience macro to get the data in an element.
  */
-# define _s_rb_tree_get_color(tree) ((tree) ? (tree)->color : _e_black)
+# define m_s_rb_tree_get_color(tree) ((tree) ? (tree)->color : _e_black)
 
 /**
  * @brief A convenience macro to get the previous element in a list.
  */
-# define _s_rb_tree_get_left(tree) ((tree) ? (tree)->left : NULL)
+# define m_s_rb_tree_get_left(tree) ((tree) ? (tree)->left : NULL)
 
 /**
  * @brief A convenience macro to get the next element in a list.
  */
-# define _s_rb_tree_get_right(tree) ((tree) ? (tree)->right : NULL)
+# define m_s_rb_tree_get_right(tree) ((tree) ? (tree)->right : NULL)
 
 /**
  * @brief A convenience macro to get the parent node of a node
  */
-# define _s_rb_tree_get_parent(tree) ((tree) ? (tree)->parent : NULL)
+# define m_s_rb_tree_get_parent(tree) ((tree) ? (tree)->parent : NULL)
 
 /**
  * @brief A convenience macro to get the grand parent node of a node
  */
-# define _s_rb_tree_get_grand_parent(tree) \
-	_s_rb_tree_get_parent(_s_rb_tree_get_parent(tree))
+# define m_s_rb_tree_get_grand_parent(tree) \
+	m_s_rb_tree_get_parent(m_s_rb_tree_get_parent(tree))
 
 /**
  * @brief A convenience macro to get sibling node of a node
  */
-# define _s_rb_tree_get_sibling(tree) \
-	(_s_rb_tree_get_left(_s_rb_tree_get_parent(tree)) == tree ? \
-		_s_rb_tree_get_right(_s_rb_tree_get_parent(tree)) : \
-		_s_rb_tree_get_left(_s_rb_tree_get_parent(tree)))
+# define m_s_rb_tree_get_sibling(tree) \
+	(m_s_rb_tree_get_left(m_s_rb_tree_get_parent(tree)) == tree ? \
+		m_s_rb_tree_get_right(m_s_rb_tree_get_parent(tree)) : \
+		m_s_rb_tree_get_left(m_s_rb_tree_get_parent(tree)))
 
 /**
  * @brief A convenience macro to get the position of the node according to its
  * parent (ie get 1 is node is the left one)
  */
-# define _s_rb_tree_is_left(parent, node) \
+# define m_s_rb_tree_is_left(parent, node) \
 	((parent) ? (parent)->left == node : 0)
 
 /**
  * @brief A convenience macro to get the position of the node according to its
  * parent (ie get 1 is node is the right one)
  */
-# define _s_rb_tree_is_right(parent, node) \
+# define m_s_rb_tree_is_right(parent, node) \
 	((parent) ? (parent)->right == node : 0)
+
+# define m_s_rb_tree_is_black(node) \
+	((node)->color == _e_black || (node)->color == _e_d_black)
 
 /**
  * @brief A convenience macro to change the data of a specific node
  */
-# define _s_rb_tree_set_data(tree, value) { \
+# define m_s_rb_tree_set_data(tree, value) { \
 	do { \
-		if (tree) \
+		if (tree) { \
 			(tree)->data = value; \
+		} \
 	} while (0); \
 }
 
 /**
  * @brief A convenience macro to change the color of a specific node
  */
-# define _s_rb_tree_set_color(tree, col) { \
+# define m_s_rb_tree_set_color(tree, col) { \
 	do { \
-		if (tree) \
+		if (tree) { \
 			(tree)->color = col; \
-	} while (0); \
-}
-
-/**
- * @brief A convenience macro to change the left of a specific node
- */
-# define _s_rb_tree_set_left(tree, node) { \
-	do { \
-		if (tree) \
-			(tree)->left = node; \
-	} while (0); \
-}
-
-/**
- * @brief A convenience macro to change the right of a specific node
- */
-# define _s_rb_tree_set_right(tree, node) { \
-	do { \
-		if (tree) \
-			(tree)->right = node; \
+		} \
 	} while (0); \
 }
 
 /**
  * @brief A convenience macro to get the parent node of a node
  */
-# define _s_rb_tree_set_parent(tree, node) { \
+# define m_s_rb_tree_set_parent(tree, node) { \
 	do { \
-		if (tree) \
+		if (tree) { \
 			(tree)->parent = (node); \
+		} \
+	} while (0); \
+}
+
+/**
+ * @brief A convenience macro to change the left of a specific node
+ */
+# define m_s_rb_tree_set_left(tree, node) { \
+	do { \
+		if (tree) { \
+			(tree)->left = node; \
+		} \
+	} while (0); \
+}
+
+/**
+ * @brief A convenience macro to change the right of a specific node
+ */
+# define m_s_rb_tree_set_right(tree, node) { \
+	do { \
+		if (tree) { \
+			(tree)->right = node; \
+		} \
+	} while (0); \
+}
+
+/**
+ * @brief A convenience macro to switch data from dst to src
+ */
+# define m_s_rb_tree_switch_data(dst, src, destroy) { \
+	do { \
+		if (destroy) { \
+			destroy(m_s_rb_tree_get_data(dst)); \
+		} \
+		m_s_rb_tree_set_data(dst, m_s_rb_tree_get_data(src)); \
 	} while (0); \
 }
 

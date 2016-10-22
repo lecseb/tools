@@ -127,12 +127,4 @@ export void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
 export int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
 	t_foreach_func foreach, void *data);
 
-/**
- * @brief Dump the tree into a file (debug purpose)
- * @param tree[in] : instance to dump
- * @param file[in] : file to create/write
- * @return 0 on success, -errno on error
- */
-export int s_rb_tree_dump_dot(struct s_rb_tree *tree, const char *file);
-
 #endif /* !_TOOLS_INCLUDE_TREE_S_RB_TREE_H_ */

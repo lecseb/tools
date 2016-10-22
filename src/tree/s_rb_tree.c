@@ -24,13 +24,10 @@ void s_rb_tree_delete(struct s_rb_tree *tree)
 {
 	m_return_if_fail(tree);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	if (left)
-		s_rb_tree_delete(left);
-	if (right)
-		s_rb_tree_delete(right);
+	if (m_s_rb_tree_get_left(tree))
+		s_rb_tree_delete(m_s_rb_tree_get_left(tree));
+	if (m_s_rb_tree_get_right(tree))
+		s_rb_tree_delete(m_s_rb_tree_get_right(tree));
 	_free(tree);
 }
 
@@ -38,15 +35,12 @@ void s_rb_tree_delete_full(struct s_rb_tree *tree, t_destroy_func destroy)
 {
 	m_return_if_fail(tree);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	if (left)
-		s_rb_tree_delete_full(left, destroy);
-	if (right)
-		s_rb_tree_delete_full(right, destroy);
+	if (m_s_rb_tree_get_left(tree))
+		s_rb_tree_delete_full(m_s_rb_tree_get_left(tree), destroy);
+	if (m_s_rb_tree_get_right(tree))
+		s_rb_tree_delete_full(m_s_rb_tree_get_right(tree), destroy);
 	if (destroy)
-		destroy(_s_rb_tree_get_data(tree));
+		destroy(m_s_rb_tree_get_data(tree));
 	_free(tree);
 }
 
@@ -58,54 +52,53 @@ void s_rb_tree_delete_full(struct s_rb_tree *tree, t_destroy_func destroy)
 /**
  * @brief Core function
  */
-static void *_s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth,
-	uint32_t k)
+static struct s_rb_tree *_s_rb_tree_nth_smallest(struct s_rb_tree *tree,
+	uint32_t nth, uint32_t k)
 {
 	m_return_val_if_fail(tree, NULL);
 	m_return_val_if_fail(nth > 0, NULL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
+	struct s_rb_tree *data = (m_s_rb_tree_get_left(tree)) ?
+		_s_rb_tree_nth_smallest(m_s_rb_tree_get_left(tree), nth, k) : NULL;
 
-	void *data = (left) ? _s_rb_tree_nth_smallest(left, nth, k) : NULL;
 	if (data)
 		return data;
 	else if (++k == nth)
-		return _s_rb_tree_get_data(tree);
+		return tree;
 
-	return (right) ? _s_rb_tree_nth_smallest(right, nth, k) : data;
+	return (m_s_rb_tree_get_right(tree)) ?
+		_s_rb_tree_nth_smallest(m_s_rb_tree_get_right(tree), nth, k) : data;
 }
 
 void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth)
 {
-	return _s_rb_tree_nth_smallest(tree, nth, 0);
+	return m_s_rb_tree_get_data(_s_rb_tree_nth_smallest(tree, nth, 0));
 }
 
 /**
  * @brief Core function
  */
-static void *_s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth,
-	uint32_t k)
+static struct s_rb_tree *_s_rb_tree_nth_biggest(struct s_rb_tree *tree,
+	uint32_t nth, uint32_t k)
 {
 	m_return_val_if_fail(tree, NULL);
 	m_return_val_if_fail(nth > 0, NULL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	void *data = (left) ? s_rb_tree_nth_biggest(right, nth) : NULL;
+	struct s_rb_tree *data = (m_s_rb_tree_get_right(tree)) ?
+		s_rb_tree_nth_biggest(m_s_rb_tree_get_right(tree), nth) : NULL;
 
 	if (data)
 		return data;
 	else if (++k == nth)
-		return _s_rb_tree_get_data(tree);
+		return tree;
 
-	return (right) ? s_rb_tree_nth_biggest(left, nth) : data;
+	return (m_s_rb_tree_get_left(tree)) ?
+		s_rb_tree_nth_biggest(m_s_rb_tree_get_left(tree), nth) : data;
 }
 
 void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth)
 {
-	return _s_rb_tree_nth_biggest(tree, nth, 0);
+	return m_s_rb_tree_get_data(_s_rb_tree_nth_biggest(tree, nth, 0));
 }
 
 int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func cmp, void *data)
@@ -113,16 +106,15 @@ int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func cmp, void *data)
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(cmp, -EINVAL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	int ret = cmp(_s_rb_tree_get_data(tree), data);
+	int ret = cmp(m_s_rb_tree_get_data(tree), data);
 	if (ret == 0)
 		return 0;
 	else if (ret > 0)
-		return (left) ? s_rb_tree_exist(left, cmp, data) : -EAGAIN;
+		return (m_s_rb_tree_get_left(tree)) ?
+			s_rb_tree_exist(m_s_rb_tree_get_left(tree), cmp, data) : -EAGAIN;
 	else
-		return (right) ? s_rb_tree_exist(right, cmp, data) : -EAGAIN;
+		return (m_s_rb_tree_get_right(tree)) ?
+			s_rb_tree_exist(m_s_rb_tree_get_right(tree), cmp, data) : -EAGAIN;
 }
 
 /**
@@ -145,10 +137,10 @@ static int _s_rb_tree_depth_pre(struct s_rb_tree *tree,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
+	struct s_rb_tree *left = m_s_rb_tree_get_left(tree);
+	struct s_rb_tree *right = m_s_rb_tree_get_right(tree);
 
-	int ret = foreach(_s_rb_tree_get_data(tree), user_data);
+	int ret = foreach(m_s_rb_tree_get_data(tree), user_data);
 	ret |= (left) ? _s_rb_tree_depth_pre(left, foreach, user_data) : 0;
 	ret |= (right) ? _s_rb_tree_depth_pre(right, foreach, user_data) : 0;
 
@@ -169,12 +161,12 @@ static int _s_rb_tree_depth_post(struct s_rb_tree *tree,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
+	struct s_rb_tree *left = m_s_rb_tree_get_left(tree);
+	struct s_rb_tree *right = m_s_rb_tree_get_right(tree);
 
 	int ret = (left) ? _s_rb_tree_depth_post(left, foreach, user_data) : 0;
 	ret |= (right) ? _s_rb_tree_depth_post(right, foreach, user_data) : 0;
-	ret |= foreach(_s_rb_tree_get_data(tree), user_data);
+	ret |= foreach(m_s_rb_tree_get_data(tree), user_data);
 
 	return ret;
 }
@@ -193,11 +185,11 @@ static int _s_rb_tree_depth_in(struct s_rb_tree *tree, t_foreach_func foreach,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
+	struct s_rb_tree *left = m_s_rb_tree_get_left(tree);
+	struct s_rb_tree *right = m_s_rb_tree_get_right(tree);
 
 	int ret = (left) ? _s_rb_tree_depth_post(left, foreach, user_data) : 0;
-	ret |= foreach(_s_rb_tree_get_data(tree), user_data);
+	ret |= foreach(m_s_rb_tree_get_data(tree), user_data);
 	ret |= (right) ? _s_rb_tree_depth_post(right, foreach, user_data) : 0;
 
 	return ret;
@@ -225,10 +217,10 @@ static int _s_rb_tree_breath(struct s_rb_tree *tree, t_foreach_func foreach,
 
 	while (!s_queue_empty(queue)) {
 		struct s_rb_tree *tmp = s_queue_pop(queue);
-		struct s_rb_tree *left = _s_rb_tree_get_left(tmp);
-		struct s_rb_tree *right = _s_rb_tree_get_right(tmp);
+		struct s_rb_tree *left = m_s_rb_tree_get_left(tmp);
+		struct s_rb_tree *right = m_s_rb_tree_get_right(tmp);
 
-		ret |= foreach(_s_rb_tree_get_data(tmp), data);
+		ret |= foreach(m_s_rb_tree_get_data(tmp), data);
 		ret |= (left) ? s_queue_push(queue, left) : 0;
 		ret |= (right) ? s_queue_push(queue, right) : 0;
 	}
@@ -254,97 +246,4 @@ int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
 		return _s_rb_tree_breath(tree, foreach, user_data);
 	}
 	return 0;
-}
-
-/**
- * -----------------------------------------------------------------------------
- * debug implementation
- * -----------------------------------------------------------------------------
- */
-
-#ifdef DEBUG
-
-/**
- * @brief Dump a specific node
- * @param tree[in] : node to dump
- * @param file[in] : file to export the dump
- * @return 0 on success, errno on error
- */
-static int _s_rb_tree_dump_node(struct s_rb_tree *tree, FILE *file)
-{
-	m_return_val_if_fail(tree, -EINVAL);
-	m_return_val_if_fail(file, -EINVAL);
-
-	char buff[512];
-	const char *color;
-	if (_s_rb_tree_get_color(tree) == _e_red) {
-		color = "red";
-	} else if (_s_rb_tree_get_color(tree) == _e_black) {
-		color = "grey";
-	} else {
-		color = "green";
-	}
-
-	snprintf(buff, 512, "\t%c[color=%s,style=filled]\n",
-		m_ptr_to_int(tree->data), color);
-	fwrite(buff, strlen(buff), sizeof(char), file);
-
-	return 0;
-}
-
-/**
- * @brief Dump an entire tree from the entry point tree
- * @param tree[in] : tree to dump
- * @param file[in] : file to export the dump
- * @return 0 on success, errno on error
- */
-static int _s_rb_tree_dump_dot(struct s_rb_tree *tree, FILE *file)
-{
-	m_return_val_if_fail(tree, -EINVAL);
-	m_return_val_if_fail(file, -EINVAL);
-
-	char buff[512];
-	struct s_rb_tree *left = _s_rb_tree_get_left(tree);
-	struct s_rb_tree *right = _s_rb_tree_get_right(tree);
-
-	int ret = _s_rb_tree_dump_node(tree, file);
-	if (left) {
-		snprintf(buff, 512, "\t%c -- %c;\n", m_ptr_to_int(tree->data),
-			 m_ptr_to_int(left->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
-		ret |= _s_rb_tree_dump_dot(left, file);
-	}
-	if (right) {
-		snprintf(buff, 512, "\t%c -- %c;\n", m_ptr_to_int(tree->data),
-			 m_ptr_to_int(right->data));
-		fwrite(buff, strlen(buff), sizeof(char), file);
-		ret |= _s_rb_tree_dump_dot(right, file);
-	}
-	return ret;
-}
-
-#endif /* !DEBUG */
-
-int s_rb_tree_dump_dot(struct s_rb_tree *tree, const char *file)
-{
-	m_return_val_if_fail(tree, -EINVAL);
-	m_return_val_if_fail(file, -EINVAL);
-
-	int ret = 0;
-#ifdef DEBUG
-	FILE *fd = fopen(file, "w+");
-
-	if (fd) {
-		char *header = "graph rb {\n";
-		fwrite(header, strlen(header), sizeof(char), fd);
-
-		ret = _s_rb_tree_dump_dot(tree, fd);
-
-		fwrite("}\n", 2, sizeof(char), fd);
-
-		fflush(fd);
-		fclose(fd);
-	}
-#endif /* !DEBUG */
-	return ret;
 }
