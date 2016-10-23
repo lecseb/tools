@@ -37,17 +37,17 @@ export struct s_d_list {
 /**
  * @brief A convenience macro to get the previous element in a list.
  */
-# define s_d_list_previous(list) ((list) ? (list)->prev : NULL)
+# define m_s_d_list_previous(list) ((list) ? (list)->prev : NULL)
 
 /**
  * @brief A convenience macro to get the next element in a list.
  */
-# define s_d_list_next(list) ((list) ? (list)->next : NULL)
+# define m_s_d_list_next(list) ((list) ? (list)->next : NULL)
 
 /**
  * @brief A convenience macro to get the data in an element.
  */
-# define s_d_list_data(list) ((list) ? (list)->data : NULL)
+# define m_s_d_list_data(list) ((list) ? (list)->data : NULL)
 
 /**
  * @brief Frees all of the memory used by a s_d_list. If list elements contain

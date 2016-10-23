@@ -39,8 +39,8 @@ void s_list_delete(struct s_list *list)
 {
 	m_return_if_fail(list);
 
-	if (s_list_next(list))
-		s_list_delete(s_list_next(list));
+	if (m_s_list_next(list))
+		s_list_delete(m_s_list_next(list));
 	_free(list);
 }
 
@@ -97,7 +97,7 @@ struct s_list *s_list_remove_element(struct s_list *list,
 
 	struct s_list *tmp = list;
 	while (tmp->next != element)
-		tmp = s_list_next(tmp);
+		tmp = m_s_list_next(tmp);
 
 	if (tmp) {
 		tmp->next = element->next;

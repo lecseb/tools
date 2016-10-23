@@ -41,8 +41,8 @@ void s_d_list_delete(struct s_d_list *list)
 {
 	m_return_if_fail(list);
 
-	if (s_d_list_next(list))
-		s_d_list_delete(s_d_list_next(list));
+	if (m_s_d_list_next(list))
+		s_d_list_delete(m_s_d_list_next(list));
 	_free(list);
 }
 
