@@ -93,8 +93,6 @@ struct s_d_list *s_d_list_insert(struct s_d_list *list, void *data,
 
 	if (position == 0)
 		return s_d_list_append(list, data);
-	else if (position == 0)
-		return s_d_list_prepend(list, data);
 
 	tmp_list = s_d_list_get_nth(list, position);
 	if (!tmp_list)

@@ -20,6 +20,7 @@ libtools_la_LDFLAGS= -shared -fPIC
 
 libtools_la_SOURCES= \
 	m_alloc.c \
+	list/s_list.c \
 	list/s_d_list.c \
 	list/s_stack.c \
 	queue/s_queue.c \
