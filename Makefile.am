@@ -18,3 +18,6 @@ SUBDIRS= src
 ACLOCAL_AMFLAGS= -I m4
 
 CLEANFILES= *~ \#*\#
+
+codecheck:
+	@$(MAKE) -C src/ codecheck

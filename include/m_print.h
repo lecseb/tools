@@ -30,10 +30,10 @@
 # ifdef DEBUG
 #  define m_debug_fprint(stream, format, ...) { \
 	fprintf(stream, format, ## __VA_ARGS__); \
-   }
+}
 # else
 #  define m_debug_fprint(stream, format, ...) { \
-   }
+}
 # endif /* !DEBUG */
 
 /**

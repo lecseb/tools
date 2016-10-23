@@ -77,19 +77,20 @@ static void _s_rb_tree_rearrange(struct s_rb_tree *x)
 {
 	m_return_if_fail(x);
 
+	struct s_rb_tree *gp = m_s_rb_tree_get_grand_parent(x);
 	if (m_s_rb_tree_get_color(m_s_rb_tree_get_parent(x)) == _e_red ||
 			!m_s_rb_tree_get_parent(x)) {
 		if (m_s_rb_tree_is_ll_case(x)) {
 ll_case:
 			m_s_rb_tree_set_color(x, _e_black);
-			_s_rb_tree_right_rotate(m_s_rb_tree_get_grand_parent(x));
+			_s_rb_tree_right_rotate(gp);
 		} else if (m_s_rb_tree_is_lr_case(x)) {
 			_s_rb_tree_left_rotate(m_s_rb_tree_get_parent(x));
 			goto ll_case;
 		} else if (m_s_rb_tree_is_rr_case(x)) {
 rr_case:
 			m_s_rb_tree_set_color(x, _e_black);
-			_s_rb_tree_left_rotate(m_s_rb_tree_get_grand_parent(x));
+			_s_rb_tree_left_rotate(gp);
 		} else if (m_s_rb_tree_is_rl_case(x)) {
 			_s_rb_tree_right_rotate(m_s_rb_tree_get_parent(x));
 			goto rr_case;
@@ -119,7 +120,8 @@ static struct s_rb_tree *_s_bs_tree_add(struct s_rb_tree *tree,
 			m_s_rb_tree_set_left(tree, _s_rb_tree_new(tree, data));
 			return m_s_rb_tree_get_left(tree);
 		}
-		return _s_bs_tree_add(m_s_rb_tree_get_left(tree), compare, data);
+		return _s_bs_tree_add(m_s_rb_tree_get_left(tree), compare,
+			data);
 	} else {
 		if (!m_s_rb_tree_get_right(tree)) {
 			m_s_rb_tree_set_right(tree, _s_rb_tree_new(tree, data));

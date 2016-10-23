@@ -58,7 +58,7 @@ export struct s_d_list {
 export void s_d_list_delete(struct s_d_list *list);
 
 /**
- * @brief Convenience method, which frees all the memory used by a GList, and
+ * @brief Convenience method, which frees all the memory used by a list, and
  * calls func on every element's data.
  * @param list[out] : list instance
  * @param func[in] : function pointer
@@ -149,7 +149,8 @@ export struct s_d_list *s_d_list_copy(struct s_d_list *list);
  * node, or NULL to use the original data.
  * @return the start of the new list that holds the same data as list
 */
-export struct s_d_list *s_d_list_deep_copy(struct s_d_list *list, t_copy_func func);
+export struct s_d_list *s_d_list_deep_copy(struct s_d_list *list,
+	t_copy_func func);
 
 /**
  * @brief Adds the second list onto the end of the first list. Note that the
@@ -159,7 +160,8 @@ export struct s_d_list *s_d_list_deep_copy(struct s_d_list *list, t_copy_func fu
  * point to the top of the list
  * @return the start of the new list, which equals list1 if not NULL
  */
-export struct s_d_list *s_d_list_concat(struct s_d_list *list1, struct s_d_list *list2);
+export struct s_d_list *s_d_list_concat(struct s_d_list *list1,
+	struct s_d_list *list2);
 
 /**
  * @brief Iterate over elements contained into the list

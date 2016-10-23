@@ -46,8 +46,8 @@ struct s_rb_tree *_s_bs_tree_find_min(struct s_rb_tree *v)
 {
 	m_return_val_if_fail(v, v);
 
-	struct s_rb_tree *cur = NULL;
-	for (cur = v; m_s_rb_tree_get_left(cur); cur = m_s_rb_tree_get_left(cur))
+	struct s_rb_tree *cur = v;
+	for (; m_s_rb_tree_get_left(cur); cur = m_s_rb_tree_get_left(cur))
 		;
 
 	return cur;
@@ -290,7 +290,8 @@ static struct s_rb_tree *_s_bs_tree_remove(struct s_rb_tree *v,
 	if (ret == 0) {
 		if (!m_s_rb_tree_get_left(v) && !m_s_rb_tree_get_right(v)) {
 			return _s_rb_tree_remove_no_child(v, destroy);
-		} else if (!m_s_rb_tree_get_left(v) || !m_s_rb_tree_get_right(v)) {
+		} else if (!m_s_rb_tree_get_left(v) ||
+			!m_s_rb_tree_get_right(v)) {
 			return _s_rb_tree_remove_one_child(v, destroy);
 		} else {
 			return _s_rb_tree_remove_two_child(v, cmp, destroy);
@@ -301,8 +302,8 @@ static struct s_rb_tree *_s_bs_tree_remove(struct s_rb_tree *v,
 				data);
 	} else {
 		if (m_s_rb_tree_get_right(v))
-			_s_bs_tree_remove(m_s_rb_tree_get_right(v), cmp, destroy,
-				data);
+			_s_bs_tree_remove(m_s_rb_tree_get_right(v), cmp,
+				destroy, data);
 	}
 	return v;
 }

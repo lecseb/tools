@@ -59,7 +59,8 @@ static struct s_rb_tree *_s_rb_tree_nth_smallest(struct s_rb_tree *tree,
 	m_return_val_if_fail(nth > 0, NULL);
 
 	struct s_rb_tree *data = (m_s_rb_tree_get_left(tree)) ?
-		_s_rb_tree_nth_smallest(m_s_rb_tree_get_left(tree), nth, k) : NULL;
+		_s_rb_tree_nth_smallest(m_s_rb_tree_get_left(tree), nth, k) :
+		NULL;
 
 	if (data)
 		return data;
@@ -67,7 +68,8 @@ static struct s_rb_tree *_s_rb_tree_nth_smallest(struct s_rb_tree *tree,
 		return tree;
 
 	return (m_s_rb_tree_get_right(tree)) ?
-		_s_rb_tree_nth_smallest(m_s_rb_tree_get_right(tree), nth, k) : data;
+		_s_rb_tree_nth_smallest(m_s_rb_tree_get_right(tree), nth, k) :
+		data;
 }
 
 void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth)
@@ -111,10 +113,12 @@ int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func cmp, void *data)
 		return 0;
 	else if (ret > 0)
 		return (m_s_rb_tree_get_left(tree)) ?
-			s_rb_tree_exist(m_s_rb_tree_get_left(tree), cmp, data) : -EAGAIN;
+			s_rb_tree_exist(m_s_rb_tree_get_left(tree), cmp, data) :
+			-EAGAIN;
 	else
 		return (m_s_rb_tree_get_right(tree)) ?
-			s_rb_tree_exist(m_s_rb_tree_get_right(tree), cmp, data) : -EAGAIN;
+			s_rb_tree_exist(m_s_rb_tree_get_right(tree), cmp,
+				data) : -EAGAIN;
 }
 
 /**

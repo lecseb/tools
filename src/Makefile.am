@@ -20,7 +20,7 @@ libtools_la_LDFLAGS= -shared -fPIC
 
 libtools_la_SOURCES= \
 	m_alloc.c \
-	list/s_list.c \
+	list/s_d_list.c \
 	list/s_stack.c \
 	queue/s_queue.c \
 	queue/s_ordered_queue.c \
@@ -29,4 +29,28 @@ libtools_la_SOURCES= \
 	tree/s_rb_tree-private.c \
 	tree/s_rb_tree-remove.c
 
+libtools_la_HEADERS= \
+	$(top_builddir)/include/m_alloc.h \
+	$(top_builddir)/include/m_export.h \
+	$(top_builddir)/include/t_funcs.h \
+	$(top_builddir)/include/m_print.h \
+	$(top_builddir)/include/m_utils.h \
+	$(top_builddir)/include/list/s_d_list.h \
+	$(top_builddir)/include/list/s_stack.h \
+	$(top_builddir)/include/queue/s_queue.h \
+	$(top_builddir)/include/queue/s_ordered_queue.h \
+	$(top_builddir)/include/tree/s_rb_tree.h
+
+libtools_ladir= \
+	$(top_builddir)/include/
+
 CLEANFILES= *~ \#*\#
+
+codecheck:
+	@for file in $(libtools_la_SOURCES) $(libtools_la_HEADERS); do \
+		echo $$file; \
+		$(top_builddir)/script/checkpatch.pl --no-tree --no-summary --terse \
+			--show-types -f --ignore SPLIT_STRING,BRACES $$file; \
+	done
+
+

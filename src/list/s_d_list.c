@@ -57,7 +57,8 @@ void s_d_list_delete_full(struct s_d_list *list, t_destroy_func func)
 
 struct s_d_list *s_d_list_append(struct s_d_list *list, void *data)
 {
-	struct s_d_list *last = NULL, *new_list = _s_d_list_new(NULL, data, NULL);
+	struct s_d_list *last = NULL, *new_list = _s_d_list_new(NULL, data,
+		NULL);
 
 	if (list) {
 		last = s_d_list_last(list);
