@@ -31,6 +31,8 @@ enum _e_color {
 /**
  * @brief The binary search tree structure
  * @param data: user data stored
+ * @param color: the color associate to the node
+ * @param parent: parent node
  * @param left: left child
  * @param right: right child
  */
@@ -53,12 +55,12 @@ struct s_rb_tree {
 # define m_s_rb_tree_get_color(tree) ((tree) ? (tree)->color : _e_black)
 
 /**
- * @brief A convenience macro to get the previous element in a list.
+ * @brief A convenience macro to get the left element of a node.
  */
 # define m_s_rb_tree_get_left(tree) ((tree) ? (tree)->left : NULL)
 
 /**
- * @brief A convenience macro to get the next element in a list.
+ * @brief A convenience macro to get the right element of a node.
  */
 # define m_s_rb_tree_get_right(tree) ((tree) ? (tree)->right : NULL)
 

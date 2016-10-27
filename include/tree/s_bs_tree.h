@@ -14,8 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with libtools.  If not, see <http:www.gnu.org/licenses/>.
  */
-#ifndef _TOOLS_INCLUDE_TREE_S_RB_TREE_H_
-# define _TOOLS_INCLUDE_TREE_S_RB_TREE_H_
+#ifndef _TOOLS_INCLUDE_TREE_S_BS_TREE_H_
+# define _TOOLS_INCLUDE_TREE_S_BS_TREE_H_
 
 # include <stdint.h>
 # include "e_tree.h"
@@ -25,20 +25,20 @@
 /**
  * @brief Binary search tree structure (opaque)
  */
-export struct s_rb_tree;
+export struct s_bs_tree;
 
 /**
- * @brief Deallocate a red/black tree instance
+ * @brief Deallocate a tree instance
  * @param tree[in] : instance to delete
  */
-export void s_rb_tree_delete(struct s_rb_tree *tree);
+export void s_bs_tree_delete(struct s_bs_tree *tree);
 
 /**
- * @brief Deallocate a red/black tree instance
+ * @brief Deallocate a tree instance
  * @param tree[in] : instance to delete
  * @param destroy[in] : destroy callback
  */
-export void s_rb_tree_delete_full(struct s_rb_tree *tree,
+export void s_bs_tree_delete_full(struct s_bs_tree *tree,
 	t_destroy_func destroy);
 
 /**
@@ -49,7 +49,7 @@ export void s_rb_tree_delete_full(struct s_rb_tree *tree,
  * @param data[in] : data to push into the tree
  * @return the (possibly changed) root of the tree
  */
-export struct s_rb_tree *s_rb_tree_add(struct s_rb_tree *tree,
+export struct s_bs_tree *s_bs_tree_add(struct s_bs_tree *tree,
 	t_compare_func compare, void *data);
 
 /**
@@ -60,7 +60,7 @@ export struct s_rb_tree *s_rb_tree_add(struct s_rb_tree *tree,
  * @param data[in] : data to push into the tree
  * @return the (possibly changed) root of the tree
  */
-export struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
+export struct s_bs_tree *s_bs_tree_remove(struct s_bs_tree *tree,
 	t_compare_func compare, t_destroy_func destroy, void *data);
 
 /**
@@ -69,7 +69,7 @@ export struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *tree,
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
-export int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func compare,
+export int s_bs_tree_exist(struct s_bs_tree *tree, t_compare_func compare,
 	void *data);
 
 /**
@@ -78,7 +78,7 @@ export int s_rb_tree_exist(struct s_rb_tree *tree, t_compare_func compare,
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
-export void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
+export void *s_bs_tree_nth_smallest(struct s_bs_tree *tree, uint32_t nth);
 
 /**
  * @brief Get the nth smaller element from the tree
@@ -86,21 +86,7 @@ export void *s_rb_tree_nth_smallest(struct s_rb_tree *tree, uint32_t nth);
  * @param nth[in] : the nth smaller element
  * @return a valid pointer on success, NULL on error
  */
-export void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
-
-/**
- * @brief Convenient macro to get the biggest element into the tree
- * @param tree[in] : tree to browse
- */
-# define s_rb_tree_get_biggest(tree) \
-	s_rb_tree_nth_biggest(tree, 1)
-
-/**
- * @brief Convenient macro to get the biggest element into the tree
- * @param tree[in] : tree to browse
- */
-# define s_rb_tree_get_smallest(tree) \
-	s_rb_tree_nth_smallest(tree, 1)
+export void *s_bs_tree_nth_biggest(struct s_bs_tree *tree, uint32_t nth);
 
 /**
  * @brief Browse the entire tree according to the type of search asked
@@ -110,7 +96,7 @@ export void *s_rb_tree_nth_biggest(struct s_rb_tree *tree, uint32_t nth);
  * @param data[in] : user data pass through the callback
  * @return 0 on success, errno on error
  */
-export int s_rb_tree_foreach(struct s_rb_tree *tree, enum e_tree_browse type,
+export int s_bs_tree_foreach(struct s_bs_tree *tree, enum e_tree_browse type,
 	t_foreach_func foreach, void *data);
 
-#endif /* !_TOOLS_INCLUDE_TREE_S_RB_TREE_H_ */
+#endif /* !_TOOLS_INCLUDE_TREE_S_BS_TREE_H_ */

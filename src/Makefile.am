@@ -25,22 +25,25 @@ libtools_la_SOURCES= \
 	list/s_stack.c \
 	queue/s_queue.c \
 	queue/s_ordered_queue.c \
+	tree/s_bs_tree.c \
 	tree/s_rb_tree.c \
 	tree/s_rb_tree-add.c \
 	tree/s_rb_tree-private.c \
 	tree/s_rb_tree-remove.c
 
-libtools_la_HEADERS= \
-	$(top_builddir)/include/m_alloc.h \
-	$(top_builddir)/include/m_export.h \
-	$(top_builddir)/include/t_funcs.h \
-	$(top_builddir)/include/m_print.h \
-	$(top_builddir)/include/m_utils.h \
-	$(top_builddir)/include/list/s_d_list.h \
-	$(top_builddir)/include/list/s_stack.h \
-	$(top_builddir)/include/queue/s_queue.h \
-	$(top_builddir)/include/queue/s_ordered_queue.h \
-	$(top_builddir)/include/tree/s_rb_tree.h
+include_HEADERS= \
+	$(top_srcdir)/include/m_alloc.h \
+	$(top_srcdir)/include/m_export.h \
+	$(top_srcdir)/include/t_funcs.h \
+	$(top_srcdir)/include/m_print.h \
+	$(top_srcdir)/include/m_utils.h \
+	$(top_srcdir)/include/list/s_d_list.h \
+	$(top_srcdir)/include/list/s_stack.h \
+	$(top_srcdir)/include/queue/s_queue.h \
+	$(top_srcdir)/include/queue/s_ordered_queue.h \
+	$(top_srcdir)/include/tree/e_tree.h \
+	$(top_srcdir)/include/tree/s_bs_tree.h \
+	$(top_srcdir)/include/tree/s_rb_tree.h
 
 libtools_ladir= \
 	$(top_builddir)/include/
