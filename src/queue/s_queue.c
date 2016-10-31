@@ -64,8 +64,8 @@ void *s_queue_pop(struct s_queue *queue)
 
 	struct s_d_list *tail = queue->tail;
 	if (tail) {
-		void *data = m_s_d_list_data(tail);
-		queue->tail = m_s_d_list_previous(queue->tail);
+		void *data = m_d_list_data(tail);
+		queue->tail = m_d_list_previous(queue->tail);
 		queue->list = s_d_list_remove_element(queue->list, tail);
 		s_d_list_delete(tail);
 		return data;

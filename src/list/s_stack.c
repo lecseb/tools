@@ -59,7 +59,7 @@ void *s_stack_pop(struct s_stack *stack)
 
 	if (!s_stack_empty(stack)) {
 		struct s_list *elt = stack->list;
-		void *data = m_s_list_data(elt);
+		void *data = m_list_data(elt);
 		stack->list = s_list_remove_element(stack->list, elt);
 		s_list_delete(elt);
 		return data;

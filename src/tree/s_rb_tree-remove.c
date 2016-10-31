@@ -22,7 +22,7 @@
  * @param node[in] : node to delete
  * @param operator[in] : user data deletion operator
  */
-#define m_s_rb_tree_delete_single(node, operator) { \
+#define m_rb_tree_delete_single(node, operator) { \
 	(node)->left = (node)->right = NULL; \
 	if (operator) \
 		s_rb_tree_delete_full((node), (operator)); \
@@ -47,7 +47,7 @@ struct s_rb_tree *_s_bs_tree_find_min(struct s_rb_tree *v)
 	m_return_val_if_fail(v, v);
 
 	struct s_rb_tree *cur = v;
-	for (; m_s_rb_tree_get_left(cur); cur = m_s_rb_tree_get_left(cur))
+	for (; m_rb_tree_get_left(cur); cur = m_rb_tree_get_left(cur))
 		;
 
 	return cur;
@@ -66,21 +66,21 @@ struct s_rb_tree *_s_bs_tree_switch(struct s_rb_tree *v,
 	m_return_val_if_fail(v, v);
 
 	if (u) {
-		m_s_rb_tree_set_data(v, m_s_rb_tree_get_data(u));
-		m_s_rb_tree_set_color(v, _e_black);
-		m_s_rb_tree_set_left(v, m_s_rb_tree_get_left(u));
-		m_s_rb_tree_set_parent(m_s_rb_tree_get_left(u), v);
-		m_s_rb_tree_set_right(v, m_s_rb_tree_get_right(u));
-		m_s_rb_tree_set_parent(m_s_rb_tree_get_right(u), v);
-		m_s_rb_tree_delete_single(u, NULL);
+		m_rb_tree_set_data(v, m_rb_tree_get_data(u));
+		m_rb_tree_set_color(v, _e_black);
+		m_rb_tree_set_left(v, m_rb_tree_get_left(u));
+		m_rb_tree_set_parent(m_rb_tree_get_left(u), v);
+		m_rb_tree_set_right(v, m_rb_tree_get_right(u));
+		m_rb_tree_set_parent(m_rb_tree_get_right(u), v);
+		m_rb_tree_delete_single(u, NULL);
 		return v;
 	} else {
-		if (m_s_rb_tree_is_left(m_s_rb_tree_get_parent(v), v)) {
-			m_s_rb_tree_set_left(m_s_rb_tree_get_parent(v), NULL);
-		} else if (m_s_rb_tree_is_right(m_s_rb_tree_get_parent(v), v)) {
-			m_s_rb_tree_set_right(m_s_rb_tree_get_parent(v), NULL);
+		if (m_rb_tree_is_left(m_rb_tree_get_parent(v), v)) {
+			m_rb_tree_set_left(m_rb_tree_get_parent(v), NULL);
+		} else if (m_rb_tree_is_right(m_rb_tree_get_parent(v), v)) {
+			m_rb_tree_set_right(m_rb_tree_get_parent(v), NULL);
 		}
-		m_s_rb_tree_delete_single(v, destroy);
+		m_rb_tree_delete_single(v, destroy);
 		return NULL;
 	}
 }
@@ -89,10 +89,10 @@ struct s_rb_tree *_s_bs_tree_switch(struct s_rb_tree *v,
  * @brief Convenient macro to check if we reach the case a)
  * @param s[in] : sibling node of v (node to remove)
  */
-#define m_s_rb_tree_is_black_sibling_red_child(s) \
-	(m_s_rb_tree_get_color(s) == _e_black && \
-		(m_s_rb_tree_get_color(m_s_rb_tree_get_left(s)) == _e_red || \
-		m_s_rb_tree_get_color(m_s_rb_tree_get_right(s)) == _e_red))
+#define m_rb_tree_is_black_sibling_red_child(s) \
+	(m_rb_tree_get_color(s) == _e_black && \
+		(m_rb_tree_get_color(m_rb_tree_get_left(s)) == _e_red || \
+		m_rb_tree_get_color(m_rb_tree_get_right(s)) == _e_red))
 
 /**
  * @brief Perform the case a)
@@ -101,28 +101,28 @@ struct s_rb_tree *_s_bs_tree_switch(struct s_rb_tree *v,
 static void _s_rb_tree_black_sibling_red_child(struct s_rb_tree *s)
 {
 	/* (i) left left case */
-	if (m_s_rb_tree_is_left(m_s_rb_tree_get_parent(s), s) &&
-		m_s_rb_tree_get_color(m_s_rb_tree_get_left(s)) == _e_red) {
+	if (m_rb_tree_is_left(m_rb_tree_get_parent(s), s) &&
+		m_rb_tree_get_color(m_rb_tree_get_left(s)) == _e_red) {
 ll_case:
-		m_s_rb_tree_set_color(s, _e_red);
-		m_s_rb_tree_set_color(m_s_rb_tree_get_parent(s), _e_black);
-		m_s_rb_tree_set_color(m_s_rb_tree_get_left(s), _e_black);
-		_s_rb_tree_right_rotate(m_s_rb_tree_get_parent(s));
+		m_rb_tree_set_color(s, _e_red);
+		m_rb_tree_set_color(m_rb_tree_get_parent(s), _e_black);
+		m_rb_tree_set_color(m_rb_tree_get_left(s), _e_black);
+		_s_rb_tree_right_rotate(m_rb_tree_get_parent(s));
 	/* (ii) left right case */
-	} else if (m_s_rb_tree_is_left(m_s_rb_tree_get_parent(s), s) &&
-		m_s_rb_tree_get_color(m_s_rb_tree_get_right(s)) == _e_red) {
+	} else if (m_rb_tree_is_left(m_rb_tree_get_parent(s), s) &&
+		m_rb_tree_get_color(m_rb_tree_get_right(s)) == _e_red) {
 		_s_rb_tree_left_rotate(s);
 		goto ll_case;
 	/* (iii) right right case */
-	} else if (m_s_rb_tree_is_right(m_s_rb_tree_get_parent(s), s) &&
-		m_s_rb_tree_get_color(m_s_rb_tree_get_right(s)) == _e_red) {
+	} else if (m_rb_tree_is_right(m_rb_tree_get_parent(s), s) &&
+		m_rb_tree_get_color(m_rb_tree_get_right(s)) == _e_red) {
 rr_case:
-		m_s_rb_tree_set_color(s, _e_red);
-		m_s_rb_tree_set_color(m_s_rb_tree_get_parent(s), _e_black);
-		m_s_rb_tree_set_color(m_s_rb_tree_get_right(s), _e_black);
-		_s_rb_tree_left_rotate(m_s_rb_tree_get_parent(s));
-	} else if (m_s_rb_tree_is_right(m_s_rb_tree_get_parent(s), s) &&
-		m_s_rb_tree_get_color(m_s_rb_tree_get_left(s)) == _e_red) {
+		m_rb_tree_set_color(s, _e_red);
+		m_rb_tree_set_color(m_rb_tree_get_parent(s), _e_black);
+		m_rb_tree_set_color(m_rb_tree_get_right(s), _e_black);
+		_s_rb_tree_left_rotate(m_rb_tree_get_parent(s));
+	} else if (m_rb_tree_is_right(m_rb_tree_get_parent(s), s) &&
+		m_rb_tree_get_color(m_rb_tree_get_left(s)) == _e_red) {
 		_s_rb_tree_right_rotate(s);
 		goto rr_case;
 	}
@@ -132,10 +132,10 @@ rr_case:
  * @brief Convenient macro to check if we reach the case b)
  * @param s[in] : sibling node of v (node to remove)
  */
-#define m_s_rb_tree_is_black_sibling_black_childs(s) \
-	(m_s_rb_tree_get_color(s) == _e_black && \
-		m_s_rb_tree_get_color(m_s_rb_tree_get_left(s)) == _e_black && \
-		m_s_rb_tree_get_color(m_s_rb_tree_get_right(s)) == _e_black)
+#define m_rb_tree_is_black_sibling_black_childs(s) \
+	(m_rb_tree_get_color(s) == _e_black && \
+		m_rb_tree_get_color(m_rb_tree_get_left(s)) == _e_black && \
+		m_rb_tree_get_color(m_rb_tree_get_right(s)) == _e_black)
 
 /**
  * @brief Perform the case c)
@@ -147,18 +147,18 @@ static void _s_rb_tree_red_sibling(struct s_rb_tree *u, struct s_rb_tree *s)
 	m_return_if_fail(u);
 	m_return_if_fail(s);
 
-	m_s_rb_tree_set_color(u, _e_red);
-	m_s_rb_tree_set_color(s, _e_black);
+	m_rb_tree_set_color(u, _e_red);
+	m_rb_tree_set_color(s, _e_black);
 
 	/* (i) */
-	if (m_s_rb_tree_is_left(u, s)) {
-		_s_rb_tree_right_rotate(m_s_rb_tree_get_parent(u));
+	if (m_rb_tree_is_left(u, s)) {
+		_s_rb_tree_right_rotate(m_rb_tree_get_parent(u));
 	/* (ii) */
 	} else {
-		_s_rb_tree_left_rotate(m_s_rb_tree_get_parent(u));
+		_s_rb_tree_left_rotate(m_rb_tree_get_parent(u));
 	}
-	m_s_rb_tree_set_color(s, _e_red);
-	m_s_rb_tree_set_color(u, _e_black);
+	m_rb_tree_set_color(s, _e_red);
+	m_rb_tree_set_color(u, _e_black);
 }
 
 /**
@@ -170,26 +170,26 @@ static void _s_rb_tree_reduce_d_black(struct s_rb_tree *v)
 	m_return_if_fail(v);
 
 	/* 3) */
-	while (m_s_rb_tree_get_color(v) == _e_d_black) {
-		struct s_rb_tree *s = m_s_rb_tree_get_sibling(v);
+	while (m_rb_tree_get_color(v) == _e_d_black) {
+		struct s_rb_tree *s = m_rb_tree_get_sibling(v);
 
 		/* a) */
-		if (m_s_rb_tree_is_black_sibling_red_child(s)) {
+		if (m_rb_tree_is_black_sibling_red_child(s)) {
 			_s_rb_tree_black_sibling_red_child(s);
-			m_s_rb_tree_set_color(v, _e_black);
+			m_rb_tree_set_color(v, _e_black);
 		/* b) */
-		} else if (m_s_rb_tree_is_black_sibling_black_childs(s)) {
-			struct s_rb_tree *p = m_s_rb_tree_get_parent(v);
-			m_s_rb_tree_set_color(s, _e_red);
-			m_s_rb_tree_set_color(v, _e_black);
-			v = m_s_rb_tree_get_parent(v);
-			if (m_s_rb_tree_get_color(p) == _e_black) {
-				m_s_rb_tree_set_color(v, _e_d_black);
+		} else if (m_rb_tree_is_black_sibling_black_childs(s)) {
+			struct s_rb_tree *p = m_rb_tree_get_parent(v);
+			m_rb_tree_set_color(s, _e_red);
+			m_rb_tree_set_color(v, _e_black);
+			v = m_rb_tree_get_parent(v);
+			if (m_rb_tree_get_color(p) == _e_black) {
+				m_rb_tree_set_color(v, _e_d_black);
 			} else {
-				m_s_rb_tree_set_color(v, _e_black);
+				m_rb_tree_set_color(v, _e_black);
 			}
 		/* c) */
-		} else if (m_s_rb_tree_get_color(s) == _e_red) {
+		} else if (m_rb_tree_get_color(s) == _e_red) {
 			_s_rb_tree_red_sibling(v, s);
 		}
 	}
@@ -206,16 +206,16 @@ static struct s_rb_tree *_s_rb_tree_remove_no_child(struct s_rb_tree *v,
 {
 	m_return_val_if_fail(v, v);
 
-	if (m_s_rb_tree_is_black(v)) {
-		m_s_rb_tree_set_color(v, _e_d_black);
+	if (m_rb_tree_is_black(v)) {
+		m_rb_tree_set_color(v, _e_d_black);
 		_s_rb_tree_reduce_d_black(v);
 	}
-	if (m_s_rb_tree_is_left(m_s_rb_tree_get_parent(v), v)) {
-		m_s_rb_tree_set_left(m_s_rb_tree_get_parent(v), NULL);
+	if (m_rb_tree_is_left(m_rb_tree_get_parent(v), v)) {
+		m_rb_tree_set_left(m_rb_tree_get_parent(v), NULL);
 	} else {
-		m_s_rb_tree_set_right(m_s_rb_tree_get_parent(v), NULL);
+		m_rb_tree_set_right(m_rb_tree_get_parent(v), NULL);
 	}
-	m_s_rb_tree_delete_single(v, destroy);
+	m_rb_tree_delete_single(v, destroy);
 	return NULL;
 }
 
@@ -230,23 +230,23 @@ static struct s_rb_tree *_s_rb_tree_remove_one_child(struct s_rb_tree *v,
 {
 	m_return_val_if_fail(v, v);
 
-	struct s_rb_tree *tmp = m_s_rb_tree_get_left(v) ?
-		m_s_rb_tree_get_left(v) : m_s_rb_tree_get_right(v);
+	struct s_rb_tree *tmp = m_rb_tree_get_left(v) ?
+		m_rb_tree_get_left(v) : m_rb_tree_get_right(v);
 
-	m_s_rb_tree_switch_data(v, tmp, destroy);
-	if (m_s_rb_tree_is_black(v) && m_s_rb_tree_is_black(tmp)) {
-		m_s_rb_tree_set_color(tmp, _e_d_black);
+	m_rb_tree_switch_data(v, tmp, destroy);
+	if (m_rb_tree_is_black(v) && m_rb_tree_is_black(tmp)) {
+		m_rb_tree_set_color(tmp, _e_d_black);
 		_s_rb_tree_reduce_d_black(v);
 	}
-	m_s_rb_tree_set_color(tmp, _e_black);
-	if (m_s_rb_tree_is_left(m_s_rb_tree_get_parent(v), v)) {
-		m_s_rb_tree_set_left(m_s_rb_tree_get_parent(v), tmp);
-		m_s_rb_tree_set_parent(tmp, m_s_rb_tree_get_parent(v));
+	m_rb_tree_set_color(tmp, _e_black);
+	if (m_rb_tree_is_left(m_rb_tree_get_parent(v), v)) {
+		m_rb_tree_set_left(m_rb_tree_get_parent(v), tmp);
+		m_rb_tree_set_parent(tmp, m_rb_tree_get_parent(v));
 	} else {
-		m_s_rb_tree_set_right(m_s_rb_tree_get_parent(v), tmp);
-		m_s_rb_tree_set_parent(tmp, m_s_rb_tree_get_parent(v));
+		m_rb_tree_set_right(m_rb_tree_get_parent(v), tmp);
+		m_rb_tree_set_parent(tmp, m_rb_tree_get_parent(v));
 	}
-	m_s_rb_tree_delete_single(v, NULL);
+	m_rb_tree_delete_single(v, NULL);
 	return tmp;
 }
 
@@ -261,12 +261,12 @@ static struct s_rb_tree *_s_rb_tree_remove_two_child(struct s_rb_tree *v,
 {
 	m_return_val_if_fail(v, v);
 
-	struct s_rb_tree *tmp = _s_bs_tree_find_min(m_s_rb_tree_get_left(v));
+	struct s_rb_tree *tmp = _s_bs_tree_find_min(m_rb_tree_get_left(v));
 
-	m_s_rb_tree_switch_data(v, tmp, destroy);
-	m_s_rb_tree_set_color(tmp, _e_d_black);
-	_s_bs_tree_remove(m_s_rb_tree_get_left(v), cmp, NULL,
-		m_s_rb_tree_get_data(tmp));
+	m_rb_tree_switch_data(v, tmp, destroy);
+	m_rb_tree_set_color(tmp, _e_d_black);
+	_s_bs_tree_remove(m_rb_tree_get_left(v), cmp, NULL,
+		m_rb_tree_get_data(tmp));
 
 	return v;
 }
@@ -286,23 +286,23 @@ static struct s_rb_tree *_s_bs_tree_remove(struct s_rb_tree *v,
 	m_return_val_if_fail(v, v);
 	m_return_val_if_fail(cmp, v);
 
-	int ret = cmp(m_s_rb_tree_get_data(v), data);
+	int ret = cmp(m_rb_tree_get_data(v), data);
 	if (ret == 0) {
-		if (!m_s_rb_tree_get_left(v) && !m_s_rb_tree_get_right(v)) {
+		if (!m_rb_tree_get_left(v) && !m_rb_tree_get_right(v)) {
 			return _s_rb_tree_remove_no_child(v, destroy);
-		} else if (!m_s_rb_tree_get_left(v) ||
-			!m_s_rb_tree_get_right(v)) {
+		} else if (!m_rb_tree_get_left(v) ||
+			!m_rb_tree_get_right(v)) {
 			return _s_rb_tree_remove_one_child(v, destroy);
 		} else {
 			return _s_rb_tree_remove_two_child(v, cmp, destroy);
 		}
 	} else if (ret > 0) {
-		if (m_s_rb_tree_get_left(v))
-			_s_bs_tree_remove(m_s_rb_tree_get_left(v), cmp, destroy,
+		if (m_rb_tree_get_left(v))
+			_s_bs_tree_remove(m_rb_tree_get_left(v), cmp, destroy,
 				data);
 	} else {
-		if (m_s_rb_tree_get_right(v))
-			_s_bs_tree_remove(m_s_rb_tree_get_right(v), cmp,
+		if (m_rb_tree_get_right(v))
+			_s_bs_tree_remove(m_rb_tree_get_right(v), cmp,
 				destroy, data);
 	}
 	return v;
@@ -316,6 +316,6 @@ struct s_rb_tree *s_rb_tree_remove(struct s_rb_tree *v,
 
 	v = _s_bs_tree_remove(v, compare, destroy, data);
 	if (v)
-		m_s_rb_tree_set_color(v, _e_black);
+		m_rb_tree_set_color(v, _e_black);
 	return v;
 }

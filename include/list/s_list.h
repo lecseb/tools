@@ -36,12 +36,12 @@ export struct s_list {
 /**
  * @brief A convenience macro to get the next element in a list.
  */
-# define m_s_list_next(list) ((list) ? (list)->next : NULL)
+# define m_list_next(list) ((list) ? (list)->next : NULL)
 
 /**
  * @brief A convenience macro to get the data in an element.
  */
-# define m_s_list_data(list) ((list) ? (list)->data : NULL)
+# define m_list_data(list) ((list) ? (list)->data : NULL)
 
 /**
  * @brief Frees all of the memory used by a s_list. If list elements contain

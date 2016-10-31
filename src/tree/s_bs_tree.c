@@ -35,17 +35,17 @@ struct s_bs_tree {
 /**
  * @brief A convenience macro to get the data in an element.
  */
-# define m_s_bs_tree_get_data(tree) ((tree) ? (tree)->data : NULL)
+# define m_bs_tree_get_data(tree) ((tree) ? (tree)->data : NULL)
 
 /**
  * @brief A convenience macro to get the left element of a node.
  */
-# define m_s_bs_tree_get_left(tree) ((tree) ? (tree)->left : NULL)
+# define m_bs_tree_get_left(tree) ((tree) ? (tree)->left : NULL)
 
 /**
  * @brief A convenience macro to get the right element of a node.
  */
-# define m_s_bs_tree_get_right(tree) ((tree) ? (tree)->right : NULL)
+# define m_bs_tree_get_right(tree) ((tree) ? (tree)->right : NULL)
 
 /**
  * @brief Allocate a new node
@@ -63,10 +63,10 @@ void s_sb_tree_delete(struct s_bs_tree *tree)
 {
 	m_return_if_fail(tree);
 
-	if (m_s_bs_tree_get_left(tree))
-		s_bs_tree_delete(m_s_bs_tree_get_left(tree));
-	if (m_s_bs_tree_get_right(tree))
-		s_bs_tree_delete(m_s_bs_tree_get_right(tree));
+	if (m_bs_tree_get_left(tree))
+		s_bs_tree_delete(m_bs_tree_get_left(tree));
+	if (m_bs_tree_get_right(tree))
+		s_bs_tree_delete(m_bs_tree_get_right(tree));
 	_free(tree);
 }
 
@@ -74,12 +74,12 @@ void s_bs_tree_delete_full(struct s_bs_tree *tree, t_destroy_func destroy)
 {
 	m_return_if_fail(tree);
 
-	if (m_s_bs_tree_get_left(tree))
-		s_bs_tree_delete_full(m_s_bs_tree_get_left(tree), destroy);
-	if (m_s_bs_tree_get_right(tree))
-		s_bs_tree_delete_full(m_s_bs_tree_get_right(tree), destroy);
+	if (m_bs_tree_get_left(tree))
+		s_bs_tree_delete_full(m_bs_tree_get_left(tree), destroy);
+	if (m_bs_tree_get_right(tree))
+		s_bs_tree_delete_full(m_bs_tree_get_right(tree), destroy);
 	if (destroy)
-		destroy(m_s_bs_tree_get_data(tree));
+		destroy(m_bs_tree_get_data(tree));
 	_free(tree);
 }
 
@@ -97,8 +97,8 @@ static struct s_bs_tree *_s_bs_tree_nth_smallest(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, NULL);
 	m_return_val_if_fail(nth > 0, NULL);
 
-	struct s_bs_tree *data = (m_s_bs_tree_get_left(tree)) ?
-		_s_bs_tree_nth_smallest(m_s_bs_tree_get_left(tree), nth, k) :
+	struct s_bs_tree *data = (m_bs_tree_get_left(tree)) ?
+		_s_bs_tree_nth_smallest(m_bs_tree_get_left(tree), nth, k) :
 		NULL;
 
 	if (data)
@@ -106,14 +106,14 @@ static struct s_bs_tree *_s_bs_tree_nth_smallest(struct s_bs_tree *tree,
 	else if (++k == nth)
 		return tree;
 
-	return (m_s_bs_tree_get_right(tree)) ?
-		_s_bs_tree_nth_smallest(m_s_bs_tree_get_right(tree), nth, k) :
+	return (m_bs_tree_get_right(tree)) ?
+		_s_bs_tree_nth_smallest(m_bs_tree_get_right(tree), nth, k) :
 		data;
 }
 
 void *s_bs_tree_nth_smallest(struct s_bs_tree *tree, uint32_t nth)
 {
-	return m_s_bs_tree_get_data(_s_bs_tree_nth_smallest(tree, nth, 0));
+	return m_bs_tree_get_data(_s_bs_tree_nth_smallest(tree, nth, 0));
 }
 
 /**
@@ -125,21 +125,21 @@ static struct s_bs_tree *_s_bs_tree_nth_biggest(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, NULL);
 	m_return_val_if_fail(nth > 0, NULL);
 
-	struct s_bs_tree *data = (m_s_bs_tree_get_right(tree)) ?
-		s_bs_tree_nth_biggest(m_s_bs_tree_get_right(tree), nth) : NULL;
+	struct s_bs_tree *data = (m_bs_tree_get_right(tree)) ?
+		s_bs_tree_nth_biggest(m_bs_tree_get_right(tree), nth) : NULL;
 
 	if (data)
 		return data;
 	else if (++k == nth)
 		return tree;
 
-	return (m_s_bs_tree_get_left(tree)) ?
-		s_bs_tree_nth_biggest(m_s_bs_tree_get_left(tree), nth) : data;
+	return (m_bs_tree_get_left(tree)) ?
+		s_bs_tree_nth_biggest(m_bs_tree_get_left(tree), nth) : data;
 }
 
 void *s_bs_tree_nth_biggest(struct s_bs_tree *tree, uint32_t nth)
 {
-	return m_s_bs_tree_get_data(_s_bs_tree_nth_biggest(tree, nth, 0));
+	return m_bs_tree_get_data(_s_bs_tree_nth_biggest(tree, nth, 0));
 }
 
 int s_bs_tree_exist(struct s_bs_tree *tree, t_compare_func cmp, void *data)
@@ -147,16 +147,16 @@ int s_bs_tree_exist(struct s_bs_tree *tree, t_compare_func cmp, void *data)
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(cmp, -EINVAL);
 
-	int ret = cmp(m_s_bs_tree_get_data(tree), data);
+	int ret = cmp(m_bs_tree_get_data(tree), data);
 	if (ret == 0)
 		return 0;
 	else if (ret > 0)
-		return (m_s_bs_tree_get_left(tree)) ?
-			s_bs_tree_exist(m_s_bs_tree_get_left(tree), cmp, data) :
+		return (m_bs_tree_get_left(tree)) ?
+			s_bs_tree_exist(m_bs_tree_get_left(tree), cmp, data) :
 			-EAGAIN;
 	else
-		return (m_s_bs_tree_get_right(tree)) ?
-			s_bs_tree_exist(m_s_bs_tree_get_right(tree), cmp,
+		return (m_bs_tree_get_right(tree)) ?
+			s_bs_tree_exist(m_bs_tree_get_right(tree), cmp,
 				data) : -EAGAIN;
 }
 
@@ -174,20 +174,20 @@ static struct s_bs_tree *_s_bs_tree_add(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, tree);
 	m_return_val_if_fail(compare, tree);
 
-	int ret = compare(m_s_bs_tree_get_data(tree), data);
+	int ret = compare(m_bs_tree_get_data(tree), data);
 	if (ret > 0) {
-		if (!m_s_bs_tree_get_left(tree)) {
+		if (!m_bs_tree_get_left(tree)) {
 			tree->left = _s_bs_tree_new(data);
-			return m_s_bs_tree_get_left(tree);
+			return m_bs_tree_get_left(tree);
 		}
-		return s_bs_tree_add(m_s_bs_tree_get_left(tree), compare,
+		return s_bs_tree_add(m_bs_tree_get_left(tree), compare,
 			data);
 	} else {
-		if (!m_s_bs_tree_get_right(tree)) {
+		if (!m_bs_tree_get_right(tree)) {
 			tree->right = _s_bs_tree_new(data);
-			return m_s_bs_tree_get_right(tree);
+			return m_bs_tree_get_right(tree);
 		}
-		return s_bs_tree_add(m_s_bs_tree_get_right(tree), compare,
+		return s_bs_tree_add(m_bs_tree_get_right(tree), compare,
 			data);
 	}
 }
@@ -215,8 +215,8 @@ static struct s_bs_tree *_s_bs_tree_find_min(struct s_bs_tree *tree)
 
 	struct s_bs_tree *curr = tree;
 
-	while (m_s_bs_tree_get_right(curr))
-		curr = m_s_bs_tree_get_right(curr);
+	while (m_bs_tree_get_right(curr))
+		curr = m_bs_tree_get_right(curr);
 
 	return curr;
 }
@@ -235,9 +235,9 @@ struct s_bs_tree *s_bs_tree_remove(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, tree);
 	m_return_val_if_fail(compare, tree);
 
-	struct s_bs_tree *left = m_s_bs_tree_get_left(tree);
-	struct s_bs_tree *right = m_s_bs_tree_get_right(tree);
-	int ret = compare(m_s_bs_tree_get_data(tree), data);
+	struct s_bs_tree *left = m_bs_tree_get_left(tree);
+	struct s_bs_tree *right = m_bs_tree_get_right(tree);
+	int ret = compare(m_bs_tree_get_data(tree), data);
 
 	if (ret == 0) {
 		if (!left) {
@@ -279,10 +279,10 @@ static int _s_bs_tree_depth_pre(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_bs_tree *left = m_s_bs_tree_get_left(tree);
-	struct s_bs_tree *right = m_s_bs_tree_get_right(tree);
+	struct s_bs_tree *left = m_bs_tree_get_left(tree);
+	struct s_bs_tree *right = m_bs_tree_get_right(tree);
 
-	int ret = foreach(m_s_bs_tree_get_data(tree), user_data);
+	int ret = foreach(m_bs_tree_get_data(tree), user_data);
 	ret |= (left) ? _s_bs_tree_depth_pre(left, foreach, user_data) : 0;
 	ret |= (right) ? _s_bs_tree_depth_pre(right, foreach, user_data) : 0;
 
@@ -303,12 +303,12 @@ static int _s_bs_tree_depth_post(struct s_bs_tree *tree,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_bs_tree *left = m_s_bs_tree_get_left(tree);
-	struct s_bs_tree *right = m_s_bs_tree_get_right(tree);
+	struct s_bs_tree *left = m_bs_tree_get_left(tree);
+	struct s_bs_tree *right = m_bs_tree_get_right(tree);
 
 	int ret = (left) ? _s_bs_tree_depth_post(left, foreach, user_data) : 0;
 	ret |= (right) ? _s_bs_tree_depth_post(right, foreach, user_data) : 0;
-	ret |= foreach(m_s_bs_tree_get_data(tree), user_data);
+	ret |= foreach(m_bs_tree_get_data(tree), user_data);
 
 	return ret;
 }
@@ -327,11 +327,11 @@ static int _s_bs_tree_depth_in(struct s_bs_tree *tree, t_foreach_func foreach,
 	m_return_val_if_fail(tree, -EINVAL);
 	m_return_val_if_fail(foreach, -EINVAL);
 
-	struct s_bs_tree *left = m_s_bs_tree_get_left(tree);
-	struct s_bs_tree *right = m_s_bs_tree_get_right(tree);
+	struct s_bs_tree *left = m_bs_tree_get_left(tree);
+	struct s_bs_tree *right = m_bs_tree_get_right(tree);
 
 	int ret = (left) ? _s_bs_tree_depth_post(left, foreach, user_data) : 0;
-	ret |= foreach(m_s_bs_tree_get_data(tree), user_data);
+	ret |= foreach(m_bs_tree_get_data(tree), user_data);
 	ret |= (right) ? _s_bs_tree_depth_post(right, foreach, user_data) : 0;
 
 	return ret;
@@ -359,10 +359,10 @@ static int _s_bs_tree_breath(struct s_bs_tree *tree, t_foreach_func foreach,
 
 	while (!s_queue_empty(queue)) {
 		struct s_bs_tree *tmp = s_queue_pop(queue);
-		struct s_bs_tree *left = m_s_bs_tree_get_left(tmp);
-		struct s_bs_tree *right = m_s_bs_tree_get_right(tmp);
+		struct s_bs_tree *left = m_bs_tree_get_left(tmp);
+		struct s_bs_tree *right = m_bs_tree_get_right(tmp);
 
-		ret |= foreach(m_s_bs_tree_get_data(tmp), data);
+		ret |= foreach(m_bs_tree_get_data(tmp), data);
 		ret |= (left) ? s_queue_push(queue, left) : 0;
 		ret |= (right) ? s_queue_push(queue, right) : 0;
 	}
